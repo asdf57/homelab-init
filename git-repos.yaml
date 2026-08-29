@@ -1,0 +1,15 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: GitRepository
+metadata:
+  name: ansible-inventory
+spec:
+  url: https://github.com/asdf57/inventory.git
+  branch: main
+  authentication:
+    username: asdf57
+    passwordEnvironmentVariable: GITHUB_TOKEN
+  commit:
+    authorName: Stigmergy
+    authorEmail: stigmergy@homelab.local
+    messageTemplate: "Update {{ .Publication.metadata.name }}"

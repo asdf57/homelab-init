@@ -1,0 +1,19 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: Server
+metadata:
+  name: desktop
+  labels:
+    homelab.io/role: workstation
+spec:
+  machineSelector:
+    location:
+      lldp_port: bridge/ether3
+      switch_mac: d4:01:c3:27:91:67
+  networking:
+    management:
+      interfaceSelector:
+        attachedAtMachineLocation: true
+      addressSelector:
+        family: ipv4
+        subnet: 10.1.1.0/24
