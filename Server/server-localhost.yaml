@@ -2,18 +2,18 @@
 apiVersion: homelab.io/v1alpha1
 kind: Server
 metadata:
-  name: beelink
+  name: localhost
   labels:
-    homelab.io/role: workstation
+    homelab.io/role: testing
 spec:
   machineSelector:
     location:
-      lldp_port: bridge/ether3
-      switch_mac: d4:01:c3:27:91:67
+      lldp_port: bridge/ether1337
+      switch_mac: aa:bb:cc:dd:ee:ff
   networking:
     management:
       interfaceSelector:
         attachedAtMachineLocation: true
       addressSelector:
         family: ipv4
-        subnet: 10.1.1.0/24
+        subnet: 127.0.0.1/24

@@ -2,10 +2,10 @@
 apiVersion: homelab.io/v1alpha1
 kind: InventoryPublication
 metadata:
-  name: servers-to-github
+  name: localhost-servers-to-github
 spec:
   inventoryCaptureGroupRef:
-    name: servers
+    name: localhost
 
   destinationRef:
     apiVersion: homelab.io/v1alpha1
@@ -13,7 +13,7 @@ spec:
     name: ansible-inventory
 
   target:
-    rootPath: servers
+    rootPath: localhost-inventory
     layout: ansible-directory
     inventoryFile: inventory.yaml
 

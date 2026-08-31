@@ -1,0 +1,21 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: InventoryPublication
+metadata:
+  name: servers-to-github
+spec:
+  inventoryCaptureGroupRef:
+    name: servers
+
+  destinationRef:
+    apiVersion: homelab.io/v1alpha1
+    kind: GitRepository
+    name: ansible-inventory
+
+  target:
+    rootPath: servers-inventory
+    layout: ansible-directory
+    inventoryFile: inventory.yaml
+
+  policy:
+    requireReady: true
