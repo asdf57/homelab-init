@@ -20,7 +20,7 @@ spec:
   groupVars:
     all:
       ansible_user: matt
-      ansible_ssh_private_key_file: /home/matt/.ssh/id_ed25519
+      ansible_ssh_private_key_file: /home/keiichi/.ssh/id_github
 
       host_data_path: /srv/homelab
 
@@ -38,4 +38,45 @@ spec:
       openbao_url: "https://vault.ryuugu.dev"
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 
+      stigmergy_api: "10.0.2.2"
+
+      network_driver: "macvlan"
+      ipvlan_subnet: "10.2.0.0/24"
+      ipvlan_gateway: "10.0.2.1"
+      ipvlan_mode: "l2"
+      macvlan_subnet: "10.0.2.0/24"
+      macvlan_gateway: "10.0.2.1"
+      macvlan_host_ip: "10.0.2.173/24"
+      macvlan_mode: "bridge"
+
+      concourse_version: "7.12.1"
+      concourse_ipv4: "10.0.2.126"
+      concourse_db_ipv4: "10.0.2.127"
+      concourse_url: "http://10.0.2.126:8080"
+      concourse_user: "test"
+      concourse_password: "test"
+      concourse_target: "test"
+      concourse_team: "main"
+      concourse_commands_pipeline: "commands"
+      concourse_commands_resource: "commands"
+      concourse_oauth_client_id: "fly"
+
+      cloudflare_domain: "ryuugu.dev"
+      cloudflare_api_key: ""
+
+      cert_authority: "zerossl"
+
+      nginx_acme_label: "nginx.ryuugu.dev"
+      openbao_acme_label: "vault.ryuugu.dev"
+
+      server_api_ipv4: "10.0.2.124"
+      server_api_fqdn: "stigmergy.ryuugu.dev"
+      
+      mgmt_fqdn: "mgmt.ryuugu.dev"
+
       concourse_fqdn: "ci.ryuugu.dev"
+
+      registry_fqdn: "registry.ryuugu.dev"
+
+      registry_ipv4: "10.0.2.122"
+      webhook_ipv4: "10.0.2.128"

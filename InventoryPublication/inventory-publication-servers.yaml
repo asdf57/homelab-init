@@ -13,7 +13,8 @@ spec:
     name: ansible-inventory
 
   target:
-    rootPath: servers-inventory
+    branch: servers-inventory
+    rootPath: .
     layout: ansible-directory
     inventoryFile: inventory.yaml
 
