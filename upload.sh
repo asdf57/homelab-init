@@ -1,59 +1,48 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+shopt -s nullglob
 
-# Upload all GitRepository resources
-for file in GitRepository/*.yaml; do
-    echo "Uploading GitRepository resource from $file"
-    curl --fail-with-body \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file" \
-        http://127.0.0.1:8080/api/v1alpha1/git-repositories
-done
+api_url="${STIGMERGY_API_URL:-http://127.0.0.1:8080}"
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
-for file in InventoryCaptureGroup/*.yaml; do
-    echo "Uploading InventoryCaptureGroup resource from $file"
-    curl --fail-with-body \
-        -X POST http://127.0.0.1:8080/api/v1alpha1/inventory-capture-groups \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file"
-done
+upload_resources() {
+    local kind=$1
+    local directory=$2
+    local collection=$3
+    local file name
+    local -a files=("$script_dir/$directory"/*.yaml)
 
-for file in InventoryPublication/*.yaml; do
-    echo "Uploading InventoryPublication resource from $file"
-    curl --fail-with-body \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file" \
-        http://127.0.0.1:8080/api/v1alpha1/inventory-publications
-done
+    if (( ${#files[@]} == 0 )); then
+        echo "No $kind manifests found in $script_dir/$directory" >&2
+        return 1
+    fi
 
-for file in SecretStore/*.yaml; do
-    echo "Uploading SecretStore resource from $file"
-    curl --fail-with-body \
-        -X POST http://127.0.0.1:8080/api/v1alpha1/secret-stores \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file"
-done
+    for file in "${files[@]}"; do
+        name=$(awk '
+            /^metadata:$/ { in_metadata = 1; next }
+            in_metadata && /^  name: / { print $2; exit }
+            in_metadata && /^[^ ]/ { in_metadata = 0 }
+        ' "$file")
+        if [[ -z "$name" ]]; then
+            echo "Could not find metadata.name in $file" >&2
+            return 1
+        fi
 
-for file in MachineReport/*.yaml; do
-    echo "Uploading MachineReport resource from $file"
-    curl --fail-with-body \
-        -X POST http://127.0.0.1:8080/api/v1alpha1/machine-reports \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file"
-done
+        echo "Applying $kind resource $name from $file"
+        curl --fail-with-body \
+            --request PUT \
+            --header 'Content-Type: application/yaml' \
+            --data-binary @"$file" \
+            "$api_url/api/v1alpha1/$collection/$name"
+    done
+}
 
-for file in Server/*.yaml; do
-    echo "Uploading Server resource from $file"
-    curl --fail-with-body \
-        -X POST http://127.0.0.1:8080/api/v1alpha1/servers \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file"
-done
-
-for file in SSHAccessGrant/*.yaml; do
-    echo "Uploading SSHAccessGrant resource from $file"
-    curl --fail-with-body \
-        -X POST http://127.0.0.1:8080/api/v1alpha1/ssh-access-grants \
-        -H 'Content-Type: application/yaml' \
-        --data-binary @"$file"
-done
+upload_resources GitRepository GitRepository git-repositories
+upload_resources InventoryCaptureGroup InventoryCaptureGroup inventory-capture-groups
+upload_resources InventoryPublication InventoryPublication inventory-publications
+upload_resources SecretStore SecretStore secret-stores
+upload_resources MachineReport MachineReport machine-reports
+upload_resources Server Server servers
+upload_resources SSHAccessGrant SSHAccessGrant ssh-access-grants
+upload_resources Secret Secret secrets
