@@ -46,3 +46,48 @@ upload_resources MachineReport MachineReport machine-reports
 upload_resources Server Server servers
 upload_resources SSHAccessGrant SSHAccessGrant ssh-access-grants
 upload_resources Secret Secret secrets
+
+secret_exists=$(curl --silent --fail-with-body --request GET "$api_url/api/v1alpha1/secrets/git-ssh-key" || true)
+
+# REsponse would be: {"error":{"code":"NotFound","message":"resource not found: Secret \"git-ssh-key\""}}
+
+secret_has_error=$(echo "$secret_exists" | jq -r '.error.code // empty')
+if [[ -n "$secret_has_error" ]] && [[ "$secret_has_error" != "NotFound" ]]; then
+    echo "Error checking for existing secret: $secret_exists" >&2
+    exit 1
+fi
+
+if [[ -n "$secret_exists" ]] && [[ "$secret_exists" != *"NotFound"* ]]; then
+    echo "Secret git-ssh-key already exists. Skipping upload."
+else
+    echo "Secret git-ssh-key does not exist. Uploading..."
+
+    if [[ ! -f /tmp/git_ssh_key ]]; then
+        echo "Generating new SSH key pair for git-ssh-key..."
+        ssh-keygen -t ed25519 -f /tmp/git_ssh_key -N "" -C "git-ssh-key"
+    fi
+
+    # build the Secret object
+    secret_yaml=$(cat <<EOF
+apiVersion: homelab.io/v1alpha1
+kind: Secret
+metadata:
+  name: git-ssh-key
+spec:
+  secretStoreRef:
+    name: openbao
+  path: bootstrap/git-ssh-key
+  data:
+    privateKey: |
+$(sed 's/^/      /' /tmp/git_ssh_key)
+    publicKey: |
+$(sed 's/^/      /' /tmp/git_ssh_key.pub)
+EOF
+)
+    curl --fail-with-body \
+        --request PUT \
+        --header 'Content-Type: application/yaml' \
+        --data-binary @<(echo "$secret_yaml") \
+        "$api_url/api/v1alpha1/secrets/git-ssh-key"
+    echo "Secret git-ssh-key uploaded successfully."
+fi
