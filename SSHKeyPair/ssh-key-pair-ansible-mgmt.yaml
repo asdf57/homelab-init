@@ -1,0 +1,10 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: SSHKeyPair
+metadata:
+  name: ansible-mgmt
+spec:
+  algorithm: ed25519
+  secretStoreRef:
+    name: openbao
+  path: automation/ansible-mgmt

@@ -6,6 +6,11 @@ metadata:
   labels:
     homelab.io/role: workstation
 spec:
+  users:
+    - name: ansible
+      ssh:
+        authorizedKeyRefs:
+          - name: ansible-mgmt
   machineSelector:
     location:
       lldp_port: bridge/ether3

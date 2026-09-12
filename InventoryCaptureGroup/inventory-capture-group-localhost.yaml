@@ -19,8 +19,8 @@ spec:
 
   groupVars:
     all:
-      ansible_user: keiichi
-      ansible_ssh_private_key_file: /home/keiichi/.ssh/id_github
+      ansible_user: ansible
+      ansible_ssh_private_key_file: /home/ansible/.ssh/id_github
 
       host_data_path: /srv/homelab
 

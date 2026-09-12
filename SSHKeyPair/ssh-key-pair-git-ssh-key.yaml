@@ -1,0 +1,10 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: SSHKeyPair
+metadata:
+  name: git-ssh-key
+spec:
+  algorithm: ed25519
+  secretStoreRef:
+    name: openbao
+  path: automation/git-ssh-key
