@@ -51,7 +51,6 @@ spec:
       nginx_ipv4: "10.0.2.123"
       openbao_ipv4: "10.0.2.125"
       openbao_url: "https://vault.ryuugu.dev"
-      openbao_bootstrap_url: "http://10.0.2.125:8200"
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 
       stigmergy_ipv4: "10.1.1.42"
