@@ -24,24 +24,41 @@ spec:
 
       host_data_path: /srv/homelab
 
-      git_provisioning_api_repo: "git@github.com:asdf57/stigmergy.git"
+      git_stigmergy_repo: "git@github.com:asdf57/stigmergy.git"
       git_webhook_repo: "git@github.com:asdf57/webhook-server.git"
       git_inventory_repo: "git@github.com:asdf57/inventory.git"
+      git_groupvars_repo: "git@github.com:asdf57/groupvars.git"
       git_ansible_roles_repo: "git@github.com:asdf57/ansible-roles.git"
-      git_provisioning_api_branch: main
+      git_hostvars_repo: "git@github.com:asdf57/hostvars.git"
+      git_templates_repo: "git@github.com:asdf57/homelab-templates.git"
+      git_stigmergy_branch: main
       git_webhook_branch: main
       git_inventory_branch: main
+      git_groupvars_branch: main
       git_ansible_roles_branch: main
+      git_hostvars_branch: main
+      git_templates_branch: main
+
+      groupvars_git_user_name: Homelab Provisioner
+      groupvars_git_user_email: homelab-provisioner@localhost
+
+      primary_router_name: mikrotik-1
+      primary_router_role: primary
+      primary_router_management_ip: dry-run
+      primary_router_api_port: 8728
+      primary_router_api_username: admin
 
       nginx_ipv4: "10.0.2.123"
       openbao_ipv4: "10.0.2.125"
       openbao_url: "https://vault.ryuugu.dev"
+      openbao_bootstrap_url: "http://10.0.2.125:8200"
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 
-      stigmergy_api: "10.0.2.2"
+      stigmergy_ipv4: "10.1.1.42"
+      stigmergy_fqdn: "stigmergy.ryuugu.dev"
 
       network_driver: "macvlan"
-      ipvlan_subnet: "10.2.0.0/24"
+      ipvlan_subnet: "10.0.2.0/24"
       ipvlan_gateway: "10.0.2.1"
       ipvlan_mode: "l2"
       macvlan_subnet: "10.0.2.0/24"
@@ -54,7 +71,6 @@ spec:
       concourse_db_ipv4: "10.0.2.127"
       concourse_url: "http://10.0.2.126:8080"
       concourse_user: "test"
-      concourse_password: "test"
       concourse_target: "test"
       concourse_team: "main"
       concourse_commands_pipeline: "commands"
@@ -62,17 +78,11 @@ spec:
       concourse_oauth_client_id: "fly"
 
       cloudflare_domain: "ryuugu.dev"
-      cloudflare_api_key: ""
 
       cert_authority: "zerossl"
 
       nginx_acme_label: "nginx.ryuugu.dev"
       openbao_acme_label: "vault.ryuugu.dev"
-
-      server_api_ipv4: "10.0.2.124"
-      server_api_fqdn: "stigmergy.ryuugu.dev"
-      
-      mgmt_fqdn: "mgmt.ryuugu.dev"
 
       concourse_fqdn: "ci.ryuugu.dev"
 
@@ -80,3 +90,16 @@ spec:
 
       registry_ipv4: "10.0.2.122"
       webhook_ipv4: "10.0.2.128"
+
+      git_provisioning_key_file: /etc/ssh/git_provisioning_key
+      provisioning_key_file: /etc/ssh/provisioning_key
+      droplet_key_file: /etc/ssh/id_droplet
+
+      concourse_worker_kernel_modules:
+        - overlay
+        - br_netfilter
+        - x_tables
+        - ip_tables
+        - iptable_filter
+        - iptable_nat
+        - nf_nat
