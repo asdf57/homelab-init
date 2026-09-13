@@ -24,17 +24,14 @@ spec:
 
       host_data_path: /srv/homelab
 
-      git_stigmergy_repo: "git@github.com:asdf57/stigmergy.git"
       git_webhook_repo: "git@github.com:asdf57/webhook-server.git"
       git_inventory_repo: "git@github.com:asdf57/inventory.git"
       git_ansible_roles_repo: "git@github.com:asdf57/ansible-roles.git"
-      git_stigmergy_branch: main
       git_webhook_branch: main
       git_inventory_branch: main
       git_ansible_roles_branch: main
 
       nginx_ipv4: "10.0.2.123"
-      openbao_ipv4: "10.0.2.125"
       openbao_url: "https://vault.ryuugu.dev"
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 

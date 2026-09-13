@@ -4,11 +4,10 @@ kind: GitRepository
 metadata:
   name: ansible-inventory
 spec:
-  url: https://github.com/asdf57/inventory.git
+  url: git@github.com:asdf57/inventory.git
   branch: main
   authentication:
-    username: asdf57
-    passwordEnvironmentVariable: GITHUB_TOKEN
+    sshKeyPairRef: git-ssh-key
   commit:
     authorName: Stigmergy
     authorEmail: stigmergy@homelab.local
