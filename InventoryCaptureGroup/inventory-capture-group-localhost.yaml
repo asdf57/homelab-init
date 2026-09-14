@@ -86,10 +86,6 @@ spec:
       registry_ipv4: "10.0.2.122"
       webhook_ipv4: "10.0.2.128"
 
-      git_provisioning_key_file: /etc/ssh/git_provisioning_key
-      provisioning_key_file: /etc/ssh/provisioning_key
-      droplet_key_file: /etc/ssh/id_droplet
-
       concourse_worker_kernel_modules:
         - overlay
         - br_netfilter
