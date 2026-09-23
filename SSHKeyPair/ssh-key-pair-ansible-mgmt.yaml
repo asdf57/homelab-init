@@ -7,4 +7,4 @@ spec:
   algorithm: ed25519
   secretStoreRef:
     name: openbao
-  path: automation/ansible-mgmt
+  path: automation/ansible-mgmt # make this optional -- the resource should own the default path

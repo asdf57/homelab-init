@@ -1,0 +1,11 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: Router
+metadata:
+  name: mikrotik-1
+spec:
+  authentication:
+    type: UsernamePasswordCredential
+    name: mikrotik-1-credentials
+  mgmtAddr: 10.0.2.1
+  type: Mikrotik

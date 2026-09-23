@@ -1,48 +1,33 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-shopt -s nullglob
 
 api_url="${STIGMERGY_API_URL:-http://127.0.0.1:8080}"
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
-upload_resources() {
-    local kind=$1
-    local directory=$2
-    local collection=$3
-    local file name
-    local -a files=("$script_dir/$directory"/*.yaml)
-
-    if (( ${#files[@]} == 0 )); then
-        echo "No $kind manifests found in $script_dir/$directory" >&2
-        return 1
-    fi
-
-    for file in "${files[@]}"; do
-        name=$(awk '
-            /^metadata:$/ { in_metadata = 1; next }
-            in_metadata && /^  name: / { print $2; exit }
-            in_metadata && /^[^ ]/ { in_metadata = 0 }
-        ' "$file")
-        if [[ -z "$name" ]]; then
-            echo "Could not find metadata.name in $file" >&2
-            return 1
-        fi
-
-        echo "Applying $kind resource $name from $file"
-        curl --fail-with-body \
-            --request PUT \
-            --header 'Content-Type: application/yaml' \
-            --data-binary @"$file" \
-            "$api_url/api/v1alpha1/$collection/$name"
-    done
+collection_for_kind() {
+    local kebab
+    kebab=$(printf '%s' "$1" \
+        | sed -E 's/([A-Z]+)([A-Z][a-z])|([a-z0-9])([A-Z])/\1\3-\2\4/g' \
+        | tr '[:upper:]' '[:lower:]')
+    case "$kebab" in
+        *y) printf '%sies\n' "${kebab%y}" ;;
+        *)  printf '%ss\n' "$kebab" ;;
+    esac
 }
 
-upload_resources GitRepository GitRepository git-repositories
-upload_resources InventoryCaptureGroup InventoryCaptureGroup inventory-capture-groups
-upload_resources InventoryPublication InventoryPublication inventory-publications
-upload_resources SecretStore SecretStore secret-stores
-upload_resources SSHKeyPair SSHKeyPair ssh-key-pairs
-upload_resources MachineReport MachineReport machine-reports
-upload_resources Server Server servers
-upload_resources Secret Secret secrets
+while IFS= read -r -d '' file; do
+    kind=$(yq e -r '.kind // ""' "$file")
+    name=$(yq e -r '.metadata.name // ""' "$file")
+    if [[ -z "$kind" || -z "$name" ]]; then
+        echo "Manifest $file must define kind and metadata.name" >&2
+        exit 1
+    fi
+    collection=$(collection_for_kind "$kind")
+    echo "Applying $kind/$name"
+    curl --fail-with-body \
+        --request PUT \
+        --header 'Content-Type: application/yaml' \
+        --data-binary @"$file" \
+        "$api_url/api/v1alpha1/$collection/$name"
+done < <(find "$script_dir" -mindepth 2 -maxdepth 2 -type f -name '*.yaml' -print0 | sort -z)

@@ -1,0 +1,14 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: DNSRecord
+metadata:
+  name: ansible-inventory
+spec:
+  backingStoreRef:
+    kind: Router
+    name: mikrotik-1
+  name: ansible
+  zone: homelab.example.com
+  type: A
+  value: 10.0.2.42
+  ttl: 300

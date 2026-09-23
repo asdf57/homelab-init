@@ -2,52 +2,21 @@
 apiVersion: homelab.io/v1alpha1
 kind: InventoryCaptureGroup
 metadata:
-  name: localhost
+  name: platform
 spec:
   selector:
     matchKinds:
       - apiVersion: homelab.io/v1alpha1
         kind: Server
     matchLabels:
-      homelab.io/role: testing
-
-  groups:
-    - name: testing
-      selector:
-        matchLabels:
-          homelab.io/role: testing
+      homelab.io/role: platform-config
 
   groupVars:
     all:
-      ansible_user: ansible
-      ansible_ssh_private_key_file: /home/ansible/.ssh/id_github
-
-      host_data_path: /srv/homelab
-
       git_webhook_repo: "git@github.com:asdf57/webhook-server.git"
-      git_inventory_repo: "git@github.com:asdf57/inventory.git"
-      git_groupvars_repo: "git@github.com:asdf57/groupvars.git"
-      git_ansible_roles_repo: "git@github.com:asdf57/ansible-roles.git"
-      git_hostvars_repo: "git@github.com:asdf57/hostvars.git"
-      git_templates_repo: "git@github.com:asdf57/homelab-templates.git"
       git_webhook_branch: main
-      git_inventory_branch: main
-      git_groupvars_branch: main
-      git_ansible_roles_branch: main
-      git_hostvars_branch: main
-      git_templates_branch: main
-
-      groupvars_git_user_name: Homelab Provisioner
-      groupvars_git_user_email: homelab-provisioner@localhost
-
-      primary_router_name: mikrotik-1
-      primary_router_role: primary
-      primary_router_management_ip: dry-run
-      primary_router_api_port: 8728
-      primary_router_api_username: admin
 
       nginx_ipv4: "10.0.2.123"
-      openbao_url: "https://vault.ryuugu.dev"
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 
       stigmergy_fqdn: "stigmergy.ryuugu.dev"
@@ -68,9 +37,6 @@ spec:
       concourse_user: "test"
       concourse_target: "test"
       concourse_team: "main"
-      concourse_commands_pipeline: "commands"
-      concourse_commands_resource: "commands"
-      concourse_oauth_client_id: "fly"
 
       cloudflare_domain: "ryuugu.dev"
 

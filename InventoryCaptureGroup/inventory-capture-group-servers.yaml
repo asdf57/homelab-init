@@ -20,22 +20,7 @@ spec:
   groupVars:
     all:
       ansible_user: ansible
-      ansible_ssh_private_key_file: /home/ansible/.ssh/id_github
-
-      host_data_path: /srv/homelab
-
-      git_webhook_repo: "git@github.com:asdf57/webhook-server.git"
-      git_inventory_repo: "git@github.com:asdf57/inventory.git"
-      git_ansible_roles_repo: "git@github.com:asdf57/ansible-roles.git"
-      git_webhook_branch: main
-      git_inventory_branch: main
-      git_ansible_roles_branch: main
-
-      nginx_ipv4: "10.0.2.123"
-      openbao_url: "https://vault.ryuugu.dev"
-      openbao_api_fqdn: "vault-api.ryuugu.dev"
-
-      concourse_fqdn: "ci.ryuugu.dev"
+      ansible_ssh_private_key_file: /home/keiichi/.ssh/id_ansible_mgmt
 
     workstations:
       desktop_environment: true
