@@ -1,0 +1,12 @@
+apiVersion: homelab.io/v1alpha1
+kind: Command
+metadata:
+  name: servers
+spec:
+  inventoryCaptureGroupRef:
+    name: servers
+  script: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    ansible all --module-name ansible.builtin.command --args 'ps aux'

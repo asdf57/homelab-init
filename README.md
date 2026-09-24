@@ -70,6 +70,8 @@ Review these resources:
   groups and Ansible variables.
 - `DNSRecord/`: optional static DNS records.
 - `CommandsPipeline/`: command file, capture group, repository, and provider.
+- `Command/`: multiline command scripts published to each capture group's
+  command file.
 
 The `platform` capture group's `groupVars.all` must define:
 
@@ -124,21 +126,21 @@ homelabc init --artifacts
 
 Stigmergy creates the `commands-servers` pipeline from
 `CommandsPipeline/commands-pipeline-servers.yaml`. Each capture group uses its
-own same-named branch. To run the included group, commit `servers.sh` on branch
-`servers` in `asdf57/commands`:
+own same-named branch. Edit `Command/command-servers.yaml` to change the
+multiline script. Stigmergy commits it to `servers.sh` on branch `servers` in
+`asdf57/commands` automatically:
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
-ansible all -m ping
-ansible workstations -m shell -a 'uptime'
+ansible all --module-name ansible.builtin.command --args 'ps aux'
 ```
 
-Only changes to that file on that branch trigger it. The complete multiline file runs in a
-fresh normal-mode container with the group's live inventory, current Ansible
-roles, and resolved SSH keys. Add another `CommandsPipeline` resource and
-command file to support another capture group.
+Only changes to that file on that branch trigger it. The complete multiline
+file runs in a fresh normal-mode container with the group's live inventory,
+current Ansible roles, and resolved SSH keys. Add one `CommandsPipeline` and
+one `Command` resource for another capture group.
 
 The command applies this repository, reads platform variables directly from
 Stigmergy, converges the platform, checks `/readyz`, and prints Compose status.
