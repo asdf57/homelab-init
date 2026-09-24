@@ -120,6 +120,23 @@ key before enabling pipelines:
 homelabc init --artifacts --pipelines
 ```
 
+Each published inventory gets a `commands-<group>` pipeline. To run a command
+for a group, commit a Bash file named `commands/<group>.sh` to that
+publication's repository and branch. For the included `servers` group, commit
+`commands/servers.sh` to the `servers-inventory` branch:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+ansible all -m ping
+ansible workstations -m shell -a 'uptime'
+```
+
+Only commits changing that file trigger the pipeline. Its complete multiline
+contents run in a fresh normal-mode container with the group's live inventory,
+Ansible roles, and resolved SSH keys.
+
 The command applies this repository, reads platform variables directly from
 Stigmergy, converges the platform, checks `/readyz`, and prints Compose status.
 `homelabc run` starts a fresh shell with the selected Ansible roles, live
