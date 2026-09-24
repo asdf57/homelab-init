@@ -9,4 +9,4 @@ spec:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    ansible all --module-name ansible.builtin.command --args 'ps aux'
+    ansible all --module-name ansible.builtin.command --args 'uptime'
