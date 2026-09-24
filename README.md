@@ -72,6 +72,7 @@ Review these resources:
 - `CommandsPipeline/`: command file, capture group, repository, and provider.
 - `Command/`: multiline command scripts published to each capture group's
   command file.
+- `Pipeline/`: declarative Concourse pipelines, including ISO builds.
 
 The `platform` capture group's `groupVars.all` must define:
 
@@ -118,10 +119,28 @@ can reuse the key retained in OpenBao. An account SSH key supports private
 repositories; a repository deploy key only supports the one repository where
 it was registered.
 
-Build and publish the provisioning images after configuring the deploy key:
+Publish the normal command-runner image after configuring the deploy key:
 
 ```sh
 homelabc init --artifacts
+```
+
+Stigmergy also creates the `build-isos` pipeline from
+`Pipeline/pipeline-build-isos.yaml`. A change to the ISO builders or
+`homelabd` triggers one job that builds Arch and Debian Trixie in parallel.
+Every ISO contains `homelabd`, `lldpd`, SSH, Python, the live-environment
+marker, and the current `ansible-mgmt` public key. The job publishes immutable
+revision tags and updates `latest` at:
+
+```text
+registry.ryuugu.dev/homelab/arch-iso
+registry.ryuugu.dev/homelab/debian-trixie-iso
+```
+
+Pull an ISO with ORAS:
+
+```sh
+oras pull registry.ryuugu.dev/homelab/arch-iso:latest
 ```
 
 Stigmergy creates the `commands-servers` pipeline from

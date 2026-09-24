@@ -1,0 +1,193 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: Pipeline
+metadata:
+  name: build-isos
+spec:
+  providerRef:
+    name: concourse
+  externalName: build-isos
+  definition:
+    format: concourse
+    data: |
+      resources:
+        - name: ansible-roles
+          type: git
+          source:
+            uri: https://github.com/asdf57/ansible-roles.git
+            branch: main
+            paths:
+              - roles/os/files/**
+
+        - name: homelabd
+          type: git
+          source:
+            uri: https://github.com/asdf57/homelabd.git
+            branch: main
+
+      jobs:
+        - name: build
+          plan:
+            - in_parallel:
+                - get: ansible-roles
+                  trigger: true
+                - get: homelabd
+                  trigger: true
+
+            - task: compile-homelabd
+              config:
+                platform: linux
+                image_resource:
+                  type: registry-image
+                  source:
+                    repository: golang
+                    tag: 1.26-alpine
+                inputs:
+                  - name: homelabd
+                outputs:
+                  - name: homelabd-bin
+                run:
+                  path: /bin/sh
+                  args:
+                    - -ec
+                    - |
+                      cd homelabd
+                      CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+                        go build -trimpath -ldflags '-s -w' \
+                        -o ../homelabd-bin/homelabd .
+
+            - in_parallel:
+                fail_fast: false
+                steps:
+                  - do:
+                      - task: build-arch
+                        privileged: true
+                        config:
+                          platform: linux
+                          image_resource:
+                            type: registry-image
+                            source:
+                              repository: archlinux
+                              tag: latest
+                          inputs:
+                            - name: ansible-roles
+                            - name: homelabd
+                            - name: homelabd-bin
+                          outputs:
+                            - name: arch-iso
+                          params:
+                            STIGMERGY_API_URL: https://stigmergy.ryuugu.dev
+                          run:
+                            path: /bin/bash
+                            args:
+                              - -ec
+                              - |
+                                printf '\nDisableSandbox\n' >> /etc/pacman.conf
+                                pacman-key --init
+                                pacman-key --populate archlinux
+                                pacman -Syu --noconfirm
+                                pacman -S --needed --noconfirm \
+                                  arch-install-scripts archiso curl dosfstools e2fsprogs \
+                                  erofs-utils git grub jq libarchive libisoburn mtools \
+                                  openssh python python-docutils squashfs-tools sudo zsync
+                                version="$(git -C ansible-roles rev-parse --short=12 HEAD)-$(git -C homelabd rev-parse --short=12 HEAD)"
+                                curl -fsS "${STIGMERGY_API_URL}/api/v1alpha1/ssh-key-pairs/ansible-mgmt" \
+                                  | jq -er '.status.publicKey' > /tmp/provisioning-key.pub
+                                export ISO_VERSION="$version"
+                                export HOMELABD_BINARY_SOURCE="$PWD/homelabd-bin/homelabd"
+                                export HOMELABD_SERVICE_SOURCE="$PWD/homelabd/setup/systemd/homelabd.service"
+                                export HOMELABD_SSHD_CONFIG_SOURCE="$PWD/homelabd/setup/sshd/10-homelabd.conf"
+                                export HOMELAB_API_ENDPOINT="$STIGMERGY_API_URL"
+                                ansible-roles/roles/os/files/build.sh \
+                                  -d arch -o "$PWD/arch-iso" -p /tmp/provisioning-key.pub -- -t iso
+                                printf '%s\n' "$version" > arch-iso/version
+
+                      - task: publish-arch
+                        config:
+                          platform: linux
+                          image_resource:
+                            type: registry-image
+                            source:
+                              repository: ghcr.io/oras-project/oras
+                              tag: v1.3.4
+                          inputs:
+                            - name: arch-iso
+                          params:
+                            DESTINATION: registry.ryuugu.dev/homelab/arch-iso
+                          run:
+                            path: /bin/sh
+                            args:
+                              - -ec
+                              - |
+                                version="$(cat arch-iso/version)"
+                                iso="$(find arch-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
+                                test -n "$iso"
+                                oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
+                                  "${DESTINATION}:${version}" \
+                                  "${iso}:application/vnd.homelab.bootable-iso"
+                                oras tag "${DESTINATION}:${version}" latest
+
+                  - do:
+                      - task: build-debian-trixie
+                        privileged: true
+                        config:
+                          platform: linux
+                          image_resource:
+                            type: registry-image
+                            source:
+                              repository: debian
+                              tag: trixie
+                          inputs:
+                            - name: ansible-roles
+                            - name: homelabd
+                            - name: homelabd-bin
+                          outputs:
+                            - name: debian-trixie-iso
+                          params:
+                            STIGMERGY_API_URL: https://stigmergy.ryuugu.dev
+                          run:
+                            path: /bin/bash
+                            args:
+                              - -ec
+                              - |
+                                apt-get update
+                                DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+                                  ca-certificates curl debootstrap dosfstools git grub-pc-bin \
+                                  isolinux jq live-build mtools openssh-client python3 \
+                                  squashfs-tools sudo syslinux tar wget xorriso
+                                version="$(git -C ansible-roles rev-parse --short=12 HEAD)-$(git -C homelabd rev-parse --short=12 HEAD)"
+                                curl -fsS "${STIGMERGY_API_URL}/api/v1alpha1/ssh-key-pairs/ansible-mgmt" \
+                                  | jq -er '.status.publicKey' > /tmp/provisioning-key.pub
+                                export ISO_VERSION="$version"
+                                export HOMELABD_BINARY_SOURCE="$PWD/homelabd-bin/homelabd"
+                                export HOMELABD_SERVICE_SOURCE="$PWD/homelabd/setup/systemd/homelabd.service"
+                                export HOMELABD_SSHD_CONFIG_SOURCE="$PWD/homelabd/setup/sshd/10-homelabd.conf"
+                                export HOMELAB_API_ENDPOINT="$STIGMERGY_API_URL"
+                                ansible-roles/roles/os/files/build.sh \
+                                  -d debian_trixie -o "$PWD/debian-trixie-iso" -p /tmp/provisioning-key.pub -- -t iso
+                                printf '%s\n' "$version" > debian-trixie-iso/version
+
+                      - task: publish-debian-trixie
+                        config:
+                          platform: linux
+                          image_resource:
+                            type: registry-image
+                            source:
+                              repository: ghcr.io/oras-project/oras
+                              tag: v1.3.4
+                          inputs:
+                            - name: debian-trixie-iso
+                          params:
+                            DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-iso
+                          run:
+                            path: /bin/sh
+                            args:
+                              - -ec
+                              - |
+                                version="$(cat debian-trixie-iso/version)"
+                                iso="$(find debian-trixie-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
+                                test -n "$iso"
+                                oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
+                                  "${DESTINATION}:${version}" \
+                                  "${iso}:application/vnd.homelab.bootable-iso"
+                                oras tag "${DESTINATION}:${version}" latest
