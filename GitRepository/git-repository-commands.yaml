@@ -3,5 +3,7 @@ kind: GitRepository
 metadata:
   name: commands-data
 spec:
-  url: https://github.com/asdf57/commands.git
+  url: git@github.com:asdf57/commands.git
   branch: main
+  authentication:
+    sshKeyPairRef: git-ssh-key

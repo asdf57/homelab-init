@@ -110,9 +110,11 @@ homelabc init
 ```
 
 For a new installation, copy `.status.publicKey` from
-`SSHKeyPair/git-ssh-key` and add it to GitHub with write access to the inventory
-repository. The included commands repository is public and needs no credential.
-Existing installations can reuse the key retained in OpenBao.
+`SSHKeyPair/git-ssh-key` and add it to the GitHub account that can write the
+inventory repository and read the commands repository. Existing installations
+can reuse the key retained in OpenBao. An account SSH key supports private
+repositories; a repository deploy key only supports the one repository where
+it was registered.
 
 Build and publish the provisioning images after configuring the deploy key:
 
