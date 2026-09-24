@@ -1,12 +1,9 @@
 # Initialize the homelab
 
-The inventory repository must already trust `SSHKeyPair/git-ssh-key` as a
-write-enabled GitHub deploy key.
-
 ## 1. Host and CLI configuration
 
-Install Docker with Compose, Go, Git, and Make. Create the shared data path and
-required group, then log in again:
+Install Docker with Compose, Go, and Git. Create the shared data path and
+required groups, then log in again:
 
 ```sh
 sudo groupadd --system homelab 2>/dev/null || true
@@ -38,6 +35,11 @@ general:
 
 Create `~/.homelab-init`; these are all required inputs:
 
+```sh
+touch ~/.homelab-init
+chmod 600 ~/.homelab-init
+```
+
 ```dotenv
 PRIMARY_ROUTER_NAME=mikrotik-1
 PRIMARY_ROUTER_API_USERNAME=replace-me
@@ -52,7 +54,7 @@ ZEROSSL_EAB_KID=replace-me
 ZEROSSL_EAB_HMAC_KEY=replace-me
 ```
 
-Keep this file mode `0600` and do not commit it.
+Do not commit this file.
 
 ## 2. Site configuration
 
@@ -102,10 +104,17 @@ initialize the core platform. No source checkout is required on the host:
 docker build -t homelab:latest \
   https://github.com/asdf57/arch-provisioner.git#main
 go install github.com/asdf57/homelabc@main
+export PATH="$(go env GOPATH)/bin:$PATH"
 homelabc init
 ```
 
-Provisioning images and Concourse pipelines are optional:
+For a new installation, copy `.status.publicKey` from
+`SSHKeyPair/git-ssh-key` and add it to the configured GitHub inventory
+repository as a deploy key with write access. Existing installations can reuse
+the key retained in OpenBao.
+
+Provisioning images and Concourse pipelines are optional; configure the deploy
+key before enabling pipelines:
 
 ```sh
 homelabc init --artifacts --pipelines
