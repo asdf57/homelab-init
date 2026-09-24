@@ -75,6 +75,7 @@ spec:
                             - name: homelabd-bin
                           outputs:
                             - name: arch-iso
+                            - name: arch-netboot
                           params:
                             STIGMERGY_API_URL: https://stigmergy.ryuugu.dev
                           run:
@@ -100,6 +101,8 @@ spec:
                                 export HOMELAB_API_ENDPOINT="$STIGMERGY_API_URL"
                                 ansible-roles/roles/os/files/build.sh \
                                   -d arch -o "$PWD/arch-iso" -p /tmp/provisioning-key.pub -- -t iso
+                                ansible-roles/roles/os/files/build.sh \
+                                  -d arch -o "$PWD/arch-netboot" -p /tmp/provisioning-key.pub -- -t netboot
                                 printf '%s\n' "$version" > arch-iso/version
 
                       - task: publish-arch
@@ -112,8 +115,10 @@ spec:
                               tag: v1.3.4
                           inputs:
                             - name: arch-iso
+                            - name: arch-netboot
                           params:
-                            DESTINATION: registry.ryuugu.dev/homelab/arch-iso
+                            ISO_DESTINATION: registry.ryuugu.dev/homelab/arch-iso
+                            NETBOOT_DESTINATION: registry.ryuugu.dev/homelab/arch-netboot
                           run:
                             path: /bin/sh
                             args:
@@ -123,9 +128,16 @@ spec:
                                 iso="$(find arch-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
                                 test -n "$iso"
                                 oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
-                                  "${DESTINATION}:${version}" \
+                                  "${ISO_DESTINATION}:${version}" \
                                   "${iso}:application/vnd.homelab.bootable-iso"
-                                oras tag "${DESTINATION}:${version}" latest
+                                oras tag "${ISO_DESTINATION}:${version}" latest
+                                cd arch-netboot
+                                oras push --artifact-type application/vnd.homelab.netboot.v1 \
+                                  "${NETBOOT_DESTINATION}:${version}" \
+                                  vmlinuz:application/vnd.linux.kernel \
+                                  initrd.img:application/vnd.linux.initrd \
+                                  arch/x86_64/airootfs.sfs:application/vnd.squashfs
+                                oras tag "${NETBOOT_DESTINATION}:${version}" latest
 
                   - do:
                       - task: build-debian-trixie
@@ -143,6 +155,7 @@ spec:
                             - name: homelabd-bin
                           outputs:
                             - name: debian-trixie-iso
+                            - name: debian-trixie-netboot
                           params:
                             STIGMERGY_API_URL: https://stigmergy.ryuugu.dev
                           run:
@@ -165,6 +178,8 @@ spec:
                                 export HOMELAB_API_ENDPOINT="$STIGMERGY_API_URL"
                                 ansible-roles/roles/os/files/build.sh \
                                   -d debian_trixie -o "$PWD/debian-trixie-iso" -p /tmp/provisioning-key.pub -- -t iso
+                                ansible-roles/roles/os/files/build.sh \
+                                  -d debian_trixie -o "$PWD/debian-trixie-netboot" -p /tmp/provisioning-key.pub -- -t netboot
                                 printf '%s\n' "$version" > debian-trixie-iso/version
 
                       - task: publish-debian-trixie
@@ -177,8 +192,10 @@ spec:
                               tag: v1.3.4
                           inputs:
                             - name: debian-trixie-iso
+                            - name: debian-trixie-netboot
                           params:
-                            DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-iso
+                            ISO_DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-iso
+                            NETBOOT_DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-netboot
                           run:
                             path: /bin/sh
                             args:
@@ -188,6 +205,13 @@ spec:
                                 iso="$(find debian-trixie-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
                                 test -n "$iso"
                                 oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
-                                  "${DESTINATION}:${version}" \
+                                  "${ISO_DESTINATION}:${version}" \
                                   "${iso}:application/vnd.homelab.bootable-iso"
-                                oras tag "${DESTINATION}:${version}" latest
+                                oras tag "${ISO_DESTINATION}:${version}" latest
+                                cd debian-trixie-netboot
+                                oras push --artifact-type application/vnd.homelab.netboot.v1 \
+                                  "${NETBOOT_DESTINATION}:${version}" \
+                                  vmlinuz:application/vnd.linux.kernel \
+                                  initrd.img:application/vnd.linux.initrd \
+                                  filesystem.squashfs:application/vnd.squashfs
+                                oras tag "${NETBOOT_DESTINATION}:${version}" latest

@@ -6,6 +6,11 @@ metadata:
   labels:
     homelab.io/role: workstation
 spec:
+  operatingSystem:
+    distribution: arch
+    version: rolling
+    architecture: amd64
+    bootMode: uefi
   users:
     - name: ansible
       ssh:

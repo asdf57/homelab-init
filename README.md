@@ -63,7 +63,10 @@ Review these resources:
 - `GitRepository/`: inventory and command repository URLs and authentication.
 - `Router/`: RouterOS management address; its credential reference must be
   `<PRIMARY_ROUTER_NAME>-credentials`.
-- `Server/`: LLDP selectors, management networks, users, and labels.
+- `Server/`: LLDP selectors, `operatingSystem`, management networks, users,
+  and labels. PXE selects the Server bound at that switch/port and boots its
+  declared OS; supported values are Arch/rolling/amd64/UEFI and
+  Debian/Trixie/amd64/UEFI.
 - `InventoryCaptureGroup/inventory-capture-group-platform.yaml`: platform
   addresses, domains, repositories, networking, and Concourse configuration.
 - `InventoryCaptureGroup/inventory-capture-group-servers.yaml`: managed server
@@ -135,7 +138,14 @@ revision tags and updates `latest` at:
 ```text
 registry.ryuugu.dev/homelab/arch-iso
 registry.ryuugu.dev/homelab/debian-trixie-iso
+registry.ryuugu.dev/homelab/arch-netboot
+registry.ryuugu.dev/homelab/debian-trixie-netboot
 ```
+
+The `iso-sync` service mirrors the two `latest` netboot artifacts into Nginx.
+At PXE boot, Stigmergy maps the NIC MAC to its discovered Machine, follows the
+Server binding established by the LLDP switch/port selector, and chains the
+boot script for `Server.spec.operatingSystem`.
 
 Pull an ISO with ORAS:
 
