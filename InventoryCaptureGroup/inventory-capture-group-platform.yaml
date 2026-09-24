@@ -13,7 +13,7 @@ spec:
 
   groupVars:
     all:
-      git_webhook_repo: "git@github.com:asdf57/webhook-server.git"
+      git_webhook_repo: "https://github.com/asdf57/webhook-server.git"
       git_webhook_branch: main
 
       nginx_ipv4: "10.0.2.123"
