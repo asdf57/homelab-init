@@ -4,6 +4,5 @@ metadata:
   name: commands-data
 spec:
   url: git@github.com:asdf57/commands.git
-  branch: main
   authentication:
     sshKeyPairRef: git-ssh-key

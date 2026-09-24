@@ -5,7 +5,6 @@ metadata:
   name: ansible-inventory
 spec:
   url: git@github.com:asdf57/inventory.git
-  branch: main
   authentication:
     sshKeyPairRef: git-ssh-key
   commit:

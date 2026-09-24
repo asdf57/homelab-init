@@ -60,7 +60,7 @@ Do not commit this file.
 
 Review these resources:
 
-- `GitRepository/`: inventory and command repository URLs and branches.
+- `GitRepository/`: inventory and command repository URLs and authentication.
 - `Router/`: RouterOS management address; its credential reference must be
   `<PRIMARY_ROUTER_NAME>-credentials`.
 - `Server/`: LLDP selectors, management networks, users, and labels.
@@ -123,8 +123,9 @@ homelabc init --artifacts
 ```
 
 Stigmergy creates the `commands-servers` pipeline from
-`CommandsPipeline/commands-pipeline-servers.yaml`. To run it, commit
-`servers.sh` on `main` in `asdf57/commands`:
+`CommandsPipeline/commands-pipeline-servers.yaml`. Each capture group uses its
+own same-named branch. To run the included group, commit `servers.sh` on branch
+`servers` in `asdf57/commands`:
 
 ```bash
 #!/usr/bin/env bash
@@ -134,7 +135,7 @@ ansible all -m ping
 ansible workstations -m shell -a 'uptime'
 ```
 
-Only changes to that file trigger it. The complete multiline file runs in a
+Only changes to that file on that branch trigger it. The complete multiline file runs in a
 fresh normal-mode container with the group's live inventory, current Ansible
 roles, and resolved SSH keys. Add another `CommandsPipeline` resource and
 command file to support another capture group.
