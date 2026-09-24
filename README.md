@@ -18,7 +18,7 @@ Create `~/.homelabc.yaml`:
 
 ```yaml
 init:
-  env_file: /absolute/path/to/secrets.env
+  env_file: ~/.homelab-init
   data_path: /srv/homelab
   mount_path: /homelab-data
   docker_socket: /var/run/docker.sock
@@ -36,7 +36,7 @@ general:
   ansible_roles_ref: main
 ```
 
-Create the referenced `secrets.env`; these are all required inputs:
+Create `~/.homelab-init`; these are all required inputs:
 
 ```dotenv
 PRIMARY_ROUTER_NAME=mikrotik-1
@@ -52,7 +52,7 @@ ZEROSSL_EAB_KID=replace-me
 ZEROSSL_EAB_HMAC_KEY=replace-me
 ```
 
-Do not commit `secrets.env`.
+Keep this file mode `0600` and do not commit it.
 
 ## 2. Site configuration
 
