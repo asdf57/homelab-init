@@ -60,7 +60,7 @@ Do not commit this file.
 
 Review these resources:
 
-- `GitRepository/`: inventory repository URL and branch.
+- `GitRepository/`: inventory and command repository URLs and branches.
 - `Router/`: RouterOS management address; its credential reference must be
   `<PRIMARY_ROUTER_NAME>-credentials`.
 - `Server/`: LLDP selectors, management networks, users, and labels.
@@ -69,6 +69,7 @@ Review these resources:
 - `InventoryCaptureGroup/inventory-capture-group-servers.yaml`: managed server
   groups and Ansible variables.
 - `DNSRecord/`: optional static DNS records.
+- `CommandsPipeline/`: command file, capture group, repository, and provider.
 
 The `platform` capture group's `groupVars.all` must define:
 
@@ -109,21 +110,19 @@ homelabc init
 ```
 
 For a new installation, copy `.status.publicKey` from
-`SSHKeyPair/git-ssh-key` and add it to the configured GitHub inventory
-repository as a deploy key with write access. Existing installations can reuse
-the key retained in OpenBao.
+`SSHKeyPair/git-ssh-key` and add it to the GitHub account that can write the
+inventory repository and read the commands repository. Existing installations
+can reuse the key retained in OpenBao.
 
-Provisioning images and Concourse pipelines are optional; configure the deploy
-key before enabling pipelines:
+Build and publish the provisioning images after configuring the deploy key:
 
 ```sh
-homelabc init --artifacts --pipelines
+homelabc init --artifacts
 ```
 
-Each published inventory gets a `commands-<group>` pipeline. To run a command
-for a group, commit a Bash file named `commands/<group>.sh` to that
-publication's repository and branch. For the included `servers` group, commit
-`commands/servers.sh` to the `servers-inventory` branch:
+Stigmergy creates the `commands-servers` pipeline from
+`CommandsPipeline/commands-pipeline-servers.yaml`. To run it, commit
+`servers.sh` on `main` in `asdf57/commands`:
 
 ```bash
 #!/usr/bin/env bash
@@ -133,9 +132,10 @@ ansible all -m ping
 ansible workstations -m shell -a 'uptime'
 ```
 
-Only commits changing that file trigger the pipeline. Its complete multiline
-contents run in a fresh normal-mode container with the group's live inventory,
-Ansible roles, and resolved SSH keys.
+Only changes to that file trigger it. The complete multiline file runs in a
+fresh normal-mode container with the group's live inventory, current Ansible
+roles, and resolved SSH keys. Add another `CommandsPipeline` resource and
+command file to support another capture group.
 
 The command applies this repository, reads platform variables directly from
 Stigmergy, converges the platform, checks `/readyz`, and prints Compose status.

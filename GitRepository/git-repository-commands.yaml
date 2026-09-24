@@ -1,0 +1,9 @@
+apiVersion: homelab.io/v1alpha1
+kind: GitRepository
+metadata:
+  name: commands-data
+spec:
+  url: git@github.com:asdf57/commands.git
+  branch: main
+  authentication:
+    sshKeyPairRef: git-ssh-key

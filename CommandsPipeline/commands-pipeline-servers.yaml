@@ -1,0 +1,12 @@
+apiVersion: homelab.io/v1alpha1
+kind: CommandsPipeline
+metadata:
+  name: servers
+spec:
+  commandsRepositoryRef:
+    name: commands-data
+  inventoryCaptureGroupRef:
+    name: servers
+  pipelineProviderRef:
+    name: concourse
+  commandPath: servers.sh
