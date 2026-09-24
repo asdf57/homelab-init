@@ -101,7 +101,7 @@ initialize the core platform. No source checkout is required on the host:
 ```sh
 docker build -t homelab:latest \
   https://github.com/asdf57/arch-provisioner.git#main
-go install github.com/asdf57/homelabc@latest
+go install github.com/asdf57/homelabc@main
 homelabc init
 ```
 
