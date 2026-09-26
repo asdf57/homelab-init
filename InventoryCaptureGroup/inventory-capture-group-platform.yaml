@@ -52,6 +52,10 @@ spec:
       registry_ipv4: "10.0.2.122"
       webhook_ipv4: "10.0.2.128"
 
+      vikunja_fqdn: "vikunja.ryuugu.dev"
+      vikunja_ipv4: "10.0.2.124"
+      vikunja_version: "2.5.0"
+
       concourse_worker_kernel_modules:
         - overlay
         - br_netfilter

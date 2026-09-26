@@ -95,7 +95,9 @@ network_driver                 nginx_acme_label
 nginx_ipv4                     openbao_acme_label
 openbao_api_fqdn
 registry_fqdn                  registry_ipv4
-stigmergy_fqdn                 webhook_ipv4
+stigmergy_fqdn                 vikunja_fqdn
+vikunja_ipv4                   vikunja_version
+webhook_ipv4
 ```
 
 DNS is enabled by default and uses `PRIMARY_ROUTER_NAME`. Set
