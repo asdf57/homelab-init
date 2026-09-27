@@ -111,33 +111,34 @@ spec:
                           image_resource:
                             type: registry-image
                             source:
-                              repository: ghcr.io/oras-project/oras
-                              tag: v1.3.4
+                              repository: curlimages/curl
+                              tag: 8.16.0
                           inputs:
                             - name: arch-iso
                             - name: arch-netboot
                           params:
-                            ISO_DESTINATION: registry.ryuugu.dev/homelab/arch-iso
-                            NETBOOT_DESTINATION: registry.ryuugu.dev/homelab/arch-netboot
+                            FILE_REGISTRY_URL: https://nginx.ryuugu.dev/registry
+                            FILE_REGISTRY_PASSWORD: ((file-registry.password))
                           run:
                             path: /bin/sh
                             args:
                               - -ec
                               - |
-                                version="$(cat arch-iso/version)"
+                                publish() {
+                                  source="$1"
+                                  path="$2"
+                                  curl -fsS --retry 3 \
+                                    -H "PW: pipeline:${FILE_REGISTRY_PASSWORD}" \
+                                    --upload-file "$source" \
+                                    "${FILE_REGISTRY_URL}/${path}"
+                                }
                                 iso="$(find arch-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
                                 test -n "$iso"
-                                oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
-                                  "${ISO_DESTINATION}:${version}" \
-                                  "${iso}:application/vnd.homelab.bootable-iso"
-                                oras tag "${ISO_DESTINATION}:${version}" latest
-                                cd arch-netboot
-                                oras push --artifact-type application/vnd.homelab.netboot.v1 \
-                                  "${NETBOOT_DESTINATION}:${version}" \
-                                  vmlinuz:application/vnd.linux.kernel \
-                                  initrd.img:application/vnd.linux.initrd \
-                                  arch/x86_64/airootfs.sfs:application/vnd.squashfs
-                                oras tag "${NETBOOT_DESTINATION}:${version}" latest
+                                publish "$iso" "iso/arch/$(basename "$iso")"
+                                publish "$iso" iso/arch/latest.iso
+                                publish arch-netboot/vmlinuz netboot/arch/vmlinuz
+                                publish arch-netboot/initrd.img netboot/arch/initrd.img
+                                publish arch-netboot/arch/x86_64/airootfs.sfs netboot/arch/arch/x86_64/airootfs.sfs
 
                   - do:
                       - task: build-debian-trixie
@@ -188,30 +189,31 @@ spec:
                           image_resource:
                             type: registry-image
                             source:
-                              repository: ghcr.io/oras-project/oras
-                              tag: v1.3.4
+                              repository: curlimages/curl
+                              tag: 8.16.0
                           inputs:
                             - name: debian-trixie-iso
                             - name: debian-trixie-netboot
                           params:
-                            ISO_DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-iso
-                            NETBOOT_DESTINATION: registry.ryuugu.dev/homelab/debian-trixie-netboot
+                            FILE_REGISTRY_URL: https://nginx.ryuugu.dev/registry
+                            FILE_REGISTRY_PASSWORD: ((file-registry.password))
                           run:
                             path: /bin/sh
                             args:
                               - -ec
                               - |
-                                version="$(cat debian-trixie-iso/version)"
+                                publish() {
+                                  source="$1"
+                                  path="$2"
+                                  curl -fsS --retry 3 \
+                                    -H "PW: pipeline:${FILE_REGISTRY_PASSWORD}" \
+                                    --upload-file "$source" \
+                                    "${FILE_REGISTRY_URL}/${path}"
+                                }
                                 iso="$(find debian-trixie-iso -maxdepth 1 -type f -name '*.iso' -print -quit)"
                                 test -n "$iso"
-                                oras push --artifact-type application/vnd.homelab.bootable-iso.v1 \
-                                  "${ISO_DESTINATION}:${version}" \
-                                  "${iso}:application/vnd.homelab.bootable-iso"
-                                oras tag "${ISO_DESTINATION}:${version}" latest
-                                cd debian-trixie-netboot
-                                oras push --artifact-type application/vnd.homelab.netboot.v1 \
-                                  "${NETBOOT_DESTINATION}:${version}" \
-                                  vmlinuz:application/vnd.linux.kernel \
-                                  initrd.img:application/vnd.linux.initrd \
-                                  filesystem.squashfs:application/vnd.squashfs
-                                oras tag "${NETBOOT_DESTINATION}:${version}" latest
+                                publish "$iso" "iso/debian-trixie/$(basename "$iso")"
+                                publish "$iso" iso/debian-trixie/latest.iso
+                                publish debian-trixie-netboot/vmlinuz netboot/debian-trixie/vmlinuz
+                                publish debian-trixie-netboot/initrd.img netboot/debian-trixie/initrd.img
+                                publish debian-trixie-netboot/filesystem.squashfs netboot/debian-trixie/filesystem.squashfs

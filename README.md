@@ -47,6 +47,7 @@ PRIMARY_ROUTER_API_PASSWORD=replace-me
 
 GITHUB_WEBHOOK_SECRET=replace-me
 CONCOURSE_PASSWORD=replace-me
+FILE_REGISTRY_PASSWORD=replace-me
 CLOUDFLARE_API_KEY=replace-me
 CLOUDFLARE_EMAIL=replace-me@example.com
 ZEROSSL_EMAIL=replace-me@example.com
@@ -134,25 +135,27 @@ Stigmergy also creates the `build-isos` pipeline from
 `Pipeline/pipeline-build-isos.yaml`. A change to the ISO builders or
 `homelabd` triggers one job that builds Arch and Debian Trixie in parallel.
 Every ISO contains `homelabd`, `lldpd`, SSH, Python, the live-environment
-marker, and the current `ansible-mgmt` public key. The job publishes immutable
-revision tags and updates `latest` at:
+marker, and the current `ansible-mgmt` public key. The job uploads each build
+to Copyparty and updates these stable direct-download URLs:
 
 ```text
-registry.ryuugu.dev/homelab/arch-iso
-registry.ryuugu.dev/homelab/debian-trixie-iso
-registry.ryuugu.dev/homelab/arch-netboot
-registry.ryuugu.dev/homelab/debian-trixie-netboot
+https://nginx.ryuugu.dev/registry/iso/arch/latest.iso
+https://nginx.ryuugu.dev/registry/iso/debian-trixie/latest.iso
 ```
 
-The `iso-sync` service mirrors the two `latest` netboot artifacts into Nginx.
-At PXE boot, Stigmergy maps the NIC MAC to its discovered Machine, follows the
-Server binding established by the LLDP switch/port selector, and chains the
-boot script for `Server.spec.operatingSystem`.
+Versioned ISO files and netboot files are browsable at
+`https://nginx.ryuugu.dev/registry/`. Downloads are public; uploads require the
+pipeline account backed by `FILE_REGISTRY_PASSWORD`. At PXE boot, Stigmergy
+maps the NIC MAC to its discovered Machine, follows the Server binding
+established by the LLDP switch/port selector, and chains the boot script for
+`Server.spec.operatingSystem`.
 
-Pull an ISO with ORAS:
+Upload any other file with curl:
 
 ```sh
-oras pull registry.ryuugu.dev/homelab/arch-iso:latest
+curl -H "PW: pipeline:$FILE_REGISTRY_PASSWORD" \
+  --upload-file ./example.img \
+  https://nginx.ryuugu.dev/registry/example.img
 ```
 
 Stigmergy creates the `commands-servers` pipeline from
