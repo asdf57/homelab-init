@@ -117,7 +117,7 @@ spec:
                             - name: arch-iso
                             - name: arch-netboot
                           params:
-                            FILE_REGISTRY_URL: https://nginx.ryuugu.dev/registry
+                            FILE_REGISTRY_URL: https://copyparty.ryuugu.dev
                             FILE_REGISTRY_PASSWORD: ((file-registry.password))
                           run:
                             path: /bin/sh
@@ -195,7 +195,7 @@ spec:
                             - name: debian-trixie-iso
                             - name: debian-trixie-netboot
                           params:
-                            FILE_REGISTRY_URL: https://nginx.ryuugu.dev/registry
+                            FILE_REGISTRY_URL: https://copyparty.ryuugu.dev
                             FILE_REGISTRY_PASSWORD: ((file-registry.password))
                           run:
                             path: /bin/sh

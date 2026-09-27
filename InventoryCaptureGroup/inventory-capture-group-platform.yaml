@@ -38,6 +38,9 @@ spec:
       concourse_target: "test"
       concourse_team: "main"
 
+      copyparty_fqdn: "copyparty.ryuugu.dev"
+      copyparty_ipv4: "10.0.2.125"
+
       cloudflare_domain: "ryuugu.dev"
 
       cert_authority: "zerossl"

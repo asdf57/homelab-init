@@ -87,6 +87,7 @@ concourse_ipv4                 concourse_target
 concourse_team                 concourse_url
 concourse_user                 concourse_version
 concourse_worker_kernel_modules
+copyparty_fqdn                copyparty_ipv4
 git_webhook_branch             git_webhook_repo
 ipvlan_gateway                 ipvlan_mode
 ipvlan_subnet
@@ -139,23 +140,23 @@ marker, and the current `ansible-mgmt` public key. The job uploads each build
 to Copyparty and updates these stable direct-download URLs:
 
 ```text
-https://nginx.ryuugu.dev/registry/iso/arch/latest.iso
-https://nginx.ryuugu.dev/registry/iso/debian-trixie/latest.iso
+https://copyparty.ryuugu.dev/iso/arch/latest.iso
+https://copyparty.ryuugu.dev/iso/debian-trixie/latest.iso
 ```
 
 Versioned ISO files and netboot files are browsable at
-`https://nginx.ryuugu.dev/registry/`. Downloads are public; uploads require the
-pipeline account backed by `FILE_REGISTRY_PASSWORD`. At PXE boot, Stigmergy
-maps the NIC MAC to its discovered Machine, follows the Server binding
-established by the LLDP switch/port selector, and chains the boot script for
-`Server.spec.operatingSystem`.
+`https://copyparty.ryuugu.dev/`. Downloads are public; uploads require the
+`pipeline` account backed by the required `FILE_REGISTRY_PASSWORD` secret. At
+PXE boot, Stigmergy maps the NIC MAC to its discovered Machine, follows the
+Server binding established by the LLDP switch/port selector, and chains the
+boot script for `Server.spec.operatingSystem`.
 
 Upload any other file with curl:
 
 ```sh
 curl -H "PW: pipeline:$FILE_REGISTRY_PASSWORD" \
   --upload-file ./example.img \
-  https://nginx.ryuugu.dev/registry/example.img
+  https://copyparty.ryuugu.dev/example.img
 ```
 
 Stigmergy creates the `commands-servers` pipeline from
