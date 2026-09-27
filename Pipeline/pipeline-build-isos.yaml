@@ -118,7 +118,7 @@ spec:
                             - name: arch-netboot
                           params:
                             FILE_REGISTRY_URL: https://copyparty.ryuugu.dev
-                            FILE_REGISTRY_PASSWORD: ((file-registry.password))
+                            FILE_REGISTRY_PASSWORD: ((file-registry))
                           run:
                             path: /bin/sh
                             args:
@@ -196,7 +196,7 @@ spec:
                             - name: debian-trixie-netboot
                           params:
                             FILE_REGISTRY_URL: https://copyparty.ryuugu.dev
-                            FILE_REGISTRY_PASSWORD: ((file-registry.password))
+                            FILE_REGISTRY_PASSWORD: ((file-registry))
                           run:
                             path: /bin/sh
                             args:
