@@ -82,13 +82,14 @@ The `platform` capture group's `groupVars.all` must define:
 
 ```text
 cert_authority                 cloudflare_domain
-concourse_db_ipv4              concourse_fqdn
-concourse_ipv4                 concourse_target
+concourse_fqdn                 concourse_internal_url
+concourse_target
 concourse_team                 concourse_url
 concourse_user                 concourse_version
 concourse_worker_kernel_modules
-copyparty_fqdn                copyparty_ipv4
+copyparty_fqdn
 git_webhook_branch             git_webhook_repo
+git_stigmergy_web_branch       git_stigmergy_web_repo
 ipvlan_gateway                 ipvlan_mode
 ipvlan_subnet
 macvlan_gateway                macvlan_host_ip
@@ -96,10 +97,10 @@ macvlan_mode                   macvlan_subnet
 network_driver                 nginx_acme_label
 nginx_ipv4                     openbao_acme_label
 openbao_api_fqdn
-registry_fqdn                  registry_ipv4
-stigmergy_fqdn                 vikunja_fqdn
-vikunja_ipv4                   vikunja_version
-webhook_ipv4
+registry_fqdn
+stigmergy_fqdn                 stigmergy_ui_fqdn
+vikunja_fqdn
+vikunja_version
 ```
 
 DNS is enabled by default and uses `PRIMARY_ROUTER_NAME`. Set

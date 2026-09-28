@@ -20,6 +20,9 @@ spec:
       openbao_api_fqdn: "vault-api.ryuugu.dev"
 
       stigmergy_fqdn: "stigmergy.ryuugu.dev"
+      stigmergy_ui_fqdn: "stigmergy-ui.ryuugu.dev"
+      git_stigmergy_web_repo: "https://github.com/asdf57/stigmergy-web.git"
+      git_stigmergy_web_branch: main
 
       network_driver: "macvlan"
       ipvlan_subnet: "10.0.2.0/24"
@@ -31,15 +34,13 @@ spec:
       macvlan_mode: "bridge"
 
       concourse_version: "7.12.1"
-      concourse_ipv4: "10.0.2.126"
-      concourse_db_ipv4: "10.0.2.127"
-      concourse_url: "http://10.0.2.126:8080"
+      concourse_url: "https://ci.ryuugu.dev"
+      concourse_internal_url: "http://concourse-web:8080"
       concourse_user: "test"
       concourse_target: "test"
       concourse_team: "main"
 
       copyparty_fqdn: "copyparty.ryuugu.dev"
-      copyparty_ipv4: "10.0.2.125"
 
       cloudflare_domain: "ryuugu.dev"
 
@@ -52,11 +53,7 @@ spec:
 
       registry_fqdn: "registry.ryuugu.dev"
 
-      registry_ipv4: "10.0.2.122"
-      webhook_ipv4: "10.0.2.128"
-
       vikunja_fqdn: "vikunja.ryuugu.dev"
-      vikunja_ipv4: "10.0.2.124"
       vikunja_version: "2.5.0"
 
       concourse_worker_kernel_modules:
