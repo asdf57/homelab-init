@@ -170,7 +170,7 @@ curl -H "PW: pipeline:$FILE_REGISTRY_PASSWORD" \
   https://copyparty.ryuugu.dev/example.img
 ```
 
-Stigmergy uses `CommandsPipeline/commands-pipeline-servers.yaml` as reusable executor settings. `Command/command-servers.yaml` requests one uptime run. Every Command has a UID-owned script directory, pinned Git commit, isolated Concourse Pipeline and tracked build. Multiple requests may target the same executor/group.
+Stigmergy uses `CommandsPipeline/commands-pipeline-servers.yaml` as reusable executor settings. `Command/command-servers.yaml` requests one uptime run. Commands share the executor's persistent Concourse pipeline, `run` job and Git branch; each has its own UID-owned script directory, pinned commit and tracked build. A durable executor slot serializes requests so their input revisions cannot race. Deleting one Command keeps the shared pipeline intact. Multiple requests may target the same executor/group.
 
 A Command spec cannot be edited. Use a new resource name for another run; reapplying an existing request is a no-op, but recreating it after deletion runs again. The bootstrap servers example intentionally has no TTL, so repeated bootstrap does not rerun it. Do not put TTL-expiring requests in continuously reapplied desired configuration.
 
