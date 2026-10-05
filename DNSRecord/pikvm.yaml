@@ -1,0 +1,14 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: DNSRecord
+metadata:
+  name: pikvm
+spec:
+  backingStoreRef:
+    kind: Router
+    name: mikrotik-1
+  name: pikvm.ryuugu.dev.
+  zone: ryuugu.dev
+  type: A
+  value: 10.1.1.51
+  ttl: 300
