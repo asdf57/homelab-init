@@ -3,6 +3,9 @@ all:
   git_webhook_branch: main
 
   nginx_ipv4: "10.0.2.123"
+  reverse_proxy_hosts:
+    - fqdn: pikvm.ryuugu.dev
+      upstream: https://10.1.1.51
   openbao_api_fqdn: "vault-api.ryuugu.dev"
 
   stigmergy_fqdn: "stigmergy.ryuugu.dev"

@@ -10,5 +10,5 @@ spec:
   name: pikvm.ryuugu.dev.
   zone: ryuugu.dev
   type: A
-  value: 10.1.1.51
+  value: 10.0.2.123
   ttl: 300

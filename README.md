@@ -183,6 +183,14 @@ Stigmergy, converges the platform, checks `/readyz`, and prints Compose status.
 inventory, and resolved SSH keys inside the container.
 # SSH management
 
+External LAN web services can be added to `GroupVars/platform.yml` using
+`reverse_proxy_hosts` entries with `fqdn` and `upstream`. Their DNS records point
+to `nginx_ipv4`, not the appliance. Nginx uses the existing domain certificate,
+supports WebSockets/streaming/uploads, and redirects HTTP to HTTPS. HTTPS
+upstream certificates are not verified, allowing LAN appliances' self-signed
+certificates; this does not authenticate the appliance against a LAN attacker.
+PiKVM is configured this way at `pikvm.ryuugu.dev`, upstream `https://10.1.1.51`.
+
 Management uses `SSHKeyPair/ansible-runner` plus its managed `SSHCertificate`.
 homelabd has no management authorized-key installation interface.
 
