@@ -190,7 +190,10 @@ Apply with an authorized `STIGMERGY_API_TOKEN`. Local `groupVarsRef` files are
 rendered into generic `groupVars` by the uploader, not sent as API fields.
 
 See `stigmergy/docs/ssh-management-rollout.md` in the homelab workspace before
-applying the manifests. New live images require separate daemon enrollment;
+applying the manifests. Live images embed the restricted agent token from private
+Concourse credentials and require authenticated ISO downloads. Token rotation
+requires rebuilding the images. Unauthenticated netboot delivery is not supported
+for these credential-bearing artifacts;
 the provisioning runner requires a private key, current certificate and verified
 known-hosts file. Trust rollout is opt-in via `homelab.io/ssh-management: enabled`
 on installed Servers.
