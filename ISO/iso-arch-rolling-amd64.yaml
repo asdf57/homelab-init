@@ -1,0 +1,14 @@
+apiVersion: homelab.io/v1alpha1
+kind: ISO
+metadata: {name: arch-rolling-amd64}
+spec:
+  distribution: arch
+  version: rolling
+  architecture: amd64
+  bootMode: uefi
+  sshCertificateAuthorityRef: {name: homelab-user-ca}
+  pipelineProviderRef: {name: concourse}
+  buildInputs:
+    repositoryRef: {name: iso-build-inputs}
+    branch: iso-build-inputs
+    path: images/arch-rolling-amd64

@@ -57,11 +57,23 @@ ZEROSSL_EAB_HMAC_KEY=replace-me
 
 Do not commit this file.
 
+Before `homelabc init`, run `make api-auth` from the Stigmergy checkout. Append
+the generated `.local/api-auth/bootstrap.env` to `~/.homelab-init` (keep mode
+0600; do not shell-source it). This supplies the required `STIGMERGY_API_POLICY`
+and admin `STIGMERGY_API_TOKEN`; bootstrap installs and mounts the API policy
+read-only. Use its separate daemon and runner tokens for those processes, never
+the admin token. `STIGMERGY_RUNNER_API_TOKEN` is also required so bootstrap can
+publish the runner's scoped API credential to OpenBao for Concourse. Stigmergy's
+`create-api-auth --bootstrap-env-source ... --bootstrap-env-output ...` command
+can prepare a fresh private combined env-file without printing its contents.
+
 ## 2. Site configuration
 
 Review these resources:
 
-- `GitRepository/`: inventory and command repository URLs and authentication.
+- `GitRepository/`: inventory, command, and dedicated `asdf57/iso-data` repository
+  URLs and authentication. Create/initialize `iso-data` first and grant the Git
+  key write access; the controller creates its input branch, not the GitHub repo.
 - `Router/`: RouterOS management address; its credential reference must be
   `<PRIMARY_ROUTER_NAME>-credentials`.
 - `Server/`: LLDP selectors, `operatingSystem`, management networks, users,
@@ -73,10 +85,14 @@ Review these resources:
 - `InventoryCaptureGroup/inventory-capture-group-servers.yaml`: managed server
   groups and Ansible variables.
 - `DNSRecord/`: optional static DNS records.
-- `CommandsPipeline/`: command file, capture group, repository, and provider.
-- `Command/`: multiline command scripts published to each capture group's
-  command file.
-- `Pipeline/`: declarative Concourse pipelines, including ISO builds.
+- `CommandsPipeline/`: reusable capture group, repository, provider, and optional scheduled command template.
+- `Command/`: immutable one-shot execution requests targeting an executor;
+  scripts are published to UID-owned Git directories.
+- `ISO/`: image configuration, CA reference, provider, and input repository.
+  Its child Pipeline is generated automatically, not uploaded manually.
+- `SSHCertificate/`: administrator-managed certificates with automatic renewal;
+  the supplied runner certificate uses principal `ansible`, TTL 24h, and renewal
+  at 8h remaining. Its public Secret is delivered through Concourse/OpenBao.
 
 The `platform` capture group's `groupVars.all` must define:
 
@@ -122,7 +138,7 @@ homelabc init
 
 For a new installation, copy `.status.publicKey` from
 `SSHKeyPair/git-ssh-key` and add it to the GitHub account that can write the
-inventory repository and read the commands repository. Existing installations
+inventory, commands, and new ISO-data repositories. Existing installations
 can reuse the key retained in OpenBao. An account SSH key supports private
 repositories; a repository deploy key only supports the one repository where
 it was registered.
@@ -133,24 +149,18 @@ Publish the normal command-runner image after configuring the deploy key:
 homelabc init --artifacts
 ```
 
-Stigmergy also creates the `build-isos` pipeline from
-`Pipeline/pipeline-build-isos.yaml`. A change to the ISO builders or
-`homelabd` triggers one job that builds Arch and Debian Trixie in parallel.
-Every ISO contains `homelabd`, `lldpd`, SSH, Python, the live-environment
-marker, and the current `ansible-mgmt` public key. The job uploads each build
-to Copyparty and updates these stable direct-download URLs:
+The ISO controller creates an owned Pipeline for each ISO resource. Its
+versioned public Git inputs contain the image configuration and SSH user-CA
+trust bundle, never a management private key or daemon API token. Changes to
+those inputs, the builders, or `homelabd` trigger a build. Images include the
+fixed `ansible` account reconciler, `homelabd`, `lldpd`, SSH, Python, and the
+live-environment marker.
 
-```text
-https://copyparty.ryuugu.dev/iso/arch/latest.iso
-https://copyparty.ryuugu.dev/iso/debian-trixie/latest.iso
-```
-
-Versioned ISO files and netboot files are browsable at
-`https://copyparty.ryuugu.dev/`. Downloads are public; uploads require the
-`pipeline` account backed by the required `FILE_REGISTRY_PASSWORD` secret. At
-PXE boot, Stigmergy maps the NIC MAC to its discovered Machine, follows the
-Server binding established by the LLDP switch/port selector, and chains the
-boot script for `Server.spec.operatingSystem`.
+Artifacts and completion manifests use immutable build paths in Copyparty;
+there is no mutable `latest.iso` dependency. Downloads are public; uploads
+require the `pipeline` account backed by `FILE_REGISTRY_PASSWORD`. PXE follows
+the Machine/Server binding and `Server.spec.boot.isoRef`, and only serves a
+completed ISO matching the Server's current CA trust.
 
 Upload any other file with curl:
 
@@ -160,25 +170,27 @@ curl -H "PW: pipeline:$FILE_REGISTRY_PASSWORD" \
   https://copyparty.ryuugu.dev/example.img
 ```
 
-Stigmergy creates the `commands-servers` pipeline from
-`CommandsPipeline/commands-pipeline-servers.yaml`. Each capture group uses its
-own same-named branch. Edit `Command/command-servers.yaml` to change the
-multiline script. Stigmergy commits it to `servers.sh` on branch `servers` in
-`asdf57/commands` automatically:
+Stigmergy uses `CommandsPipeline/commands-pipeline-servers.yaml` as reusable executor settings. `Command/command-servers.yaml` requests one uptime run. Every Command has a UID-owned script directory, pinned Git commit, isolated Concourse Pipeline and tracked build. Multiple requests may target the same executor/group.
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+A Command spec cannot be edited. Use a new resource name for another run; reapplying an existing request is a no-op, but recreating it after deletion runs again. The bootstrap servers example intentionally has no TTL, so repeated bootstrap does not rerun it. Do not put TTL-expiring requests in continuously reapplied desired configuration.
 
-ansible all --module-name ansible.builtin.command --args 'ps aux'
-```
+The `ssh-trust` executor's `schedule: 5m` and `commandTemplate` create fresh Commands with one-day retention. There is no fixed ssh-trust Command manifest. Scheduled runs skip overlap/missed intervals. Ad-hoc runs may overlap.
 
-Only changes to that file on that branch trigger it. The complete multiline
-file runs in a fresh normal-mode container with the group's live inventory,
-current Ansible roles, and resolved SSH keys. Add one `CommandsPipeline` and
-one `Command` resource for another capture group.
 
 The command applies this repository, reads platform variables directly from
 Stigmergy, converges the platform, checks `/readyz`, and prints Compose status.
 `homelabc run` starts a fresh shell with the selected Ansible roles, live
 inventory, and resolved SSH keys inside the container.
+# SSH management
+
+Management uses `SSHKeyPair/ansible-runner` plus its managed `SSHCertificate`.
+homelabd has no management authorized-key installation interface.
+
+Apply with an authorized `STIGMERGY_API_TOKEN`. Local `groupVarsRef` files are
+rendered into generic `groupVars` by the uploader, not sent as API fields.
+
+See `stigmergy/docs/ssh-management-rollout.md` in the homelab workspace before
+applying the manifests. New live images require separate daemon enrollment;
+the provisioning runner requires a private key, current certificate and verified
+known-hosts file. Trust rollout is opt-in via `homelab.io/ssh-management: enabled`
+on installed Servers.

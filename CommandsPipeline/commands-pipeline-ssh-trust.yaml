@@ -1,0 +1,14 @@
+apiVersion: homelab.io/v1alpha1
+kind: CommandsPipeline
+metadata: {name: ssh-trust}
+spec:
+  commandsRepositoryRef: {name: commands-data}
+  inventoryCaptureGroupRef: {name: ssh-trust}
+  pipelineProviderRef: {name: concourse}
+  schedule: 5m
+  commandTemplate:
+    ttlSecondsAfterFinished: 86400
+    script: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      ansible-playbook /homelab/plays/ssh_trust.yml -e ansible_user=ansible

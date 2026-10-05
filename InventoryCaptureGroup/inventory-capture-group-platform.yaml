@@ -11,56 +11,5 @@ spec:
     matchLabels:
       homelab.io/role: platform-config
 
-  groupVars:
-    all:
-      git_webhook_repo: "https://github.com/asdf57/webhook-server.git"
-      git_webhook_branch: main
-
-      nginx_ipv4: "10.0.2.123"
-      openbao_api_fqdn: "vault-api.ryuugu.dev"
-
-      stigmergy_fqdn: "stigmergy.ryuugu.dev"
-      stigmergy_ui_fqdn: "stigmergy-ui.ryuugu.dev"
-      git_stigmergy_web_repo: "https://github.com/asdf57/stigmergy-web.git"
-      git_stigmergy_web_branch: main
-
-      network_driver: "macvlan"
-      ipvlan_subnet: "10.0.2.0/24"
-      ipvlan_gateway: "10.0.2.1"
-      ipvlan_mode: "l2"
-      macvlan_subnet: "10.0.2.0/24"
-      macvlan_gateway: "10.0.2.1"
-      macvlan_host_ip: "10.0.2.173/24"
-      macvlan_mode: "bridge"
-
-      concourse_version: "7.12.1"
-      concourse_url: "https://ci.ryuugu.dev"
-      concourse_internal_url: "http://concourse-web:8080"
-      concourse_user: "test"
-      concourse_target: "test"
-      concourse_team: "main"
-
-      copyparty_fqdn: "copyparty.ryuugu.dev"
-
-      cloudflare_domain: "ryuugu.dev"
-
-      cert_authority: "zerossl"
-
-      nginx_acme_label: "nginx.ryuugu.dev"
-      openbao_acme_label: "vault.ryuugu.dev"
-
-      concourse_fqdn: "ci.ryuugu.dev"
-
-      registry_fqdn: "registry.ryuugu.dev"
-
-      vikunja_fqdn: "vikunja.ryuugu.dev"
-      vikunja_version: "2.5.0"
-
-      concourse_worker_kernel_modules:
-        - overlay
-        - br_netfilter
-        - x_tables
-        - ip_tables
-        - iptable_filter
-        - iptable_nat
-        - nf_nat
+  groupVarsRef:
+    name: platform-group-vars

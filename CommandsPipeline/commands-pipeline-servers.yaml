@@ -9,4 +9,3 @@ spec:
     name: servers
   pipelineProviderRef:
     name: concourse
-  commandPath: servers.sh

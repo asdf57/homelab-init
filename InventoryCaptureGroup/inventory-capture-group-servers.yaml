@@ -17,10 +17,8 @@ spec:
         matchLabels:
           homelab.io/role: workstation
 
-  groupVars:
-    all:
-      ansible_user: ansible
-      ansible_ssh_private_key_file: /home/keiichi/.ssh/id_ansible_mgmt
+  groupVarsRef:
+    name: servers-group-vars
 
     workstations:
       desktop_environment: true

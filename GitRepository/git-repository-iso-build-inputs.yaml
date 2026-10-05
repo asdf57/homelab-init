@@ -1,0 +1,6 @@
+apiVersion: homelab.io/v1alpha1
+kind: GitRepository
+metadata: {name: iso-build-inputs}
+spec:
+  url: git@github.com:asdf57/iso-data.git
+  authentication: {sshKeyPairRef: git-ssh-key}

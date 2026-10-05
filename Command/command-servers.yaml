@@ -3,7 +3,7 @@ kind: Command
 metadata:
   name: servers
 spec:
-  inventoryCaptureGroupRef:
+  commandsPipelineRef:
     name: servers
   script: |
     #!/usr/bin/env bash

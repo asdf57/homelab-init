@@ -1,0 +1,11 @@
+apiVersion: homelab.io/v1alpha1
+kind: InventoryCaptureGroup
+metadata: {name: ssh-trust}
+spec:
+  selector:
+    matchKinds: [{apiVersion: homelab.io/v1alpha1, kind: Server}]
+    matchLabels: {homelab.io/ssh-management: enabled}
+  groupVars:
+    all:
+      ansible_user: ansible
+      ansible_become: true

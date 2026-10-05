@@ -1,0 +1,6 @@
+apiVersion: homelab.io/v1alpha1
+kind: SSHCertificateAuthority
+metadata: {name: homelab-user-ca}
+spec:
+  signingKeyRef: {name: homelab-ca-01}
+  trustedKeyRefs: [{name: homelab-ca-01}]
