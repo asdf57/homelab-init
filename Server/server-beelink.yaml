@@ -8,8 +8,8 @@ metadata:
     homelab.io/role: workstation
 spec:
   provisioning:
-    enabled: false
-    reprovision: 0
+    enabled: true
+    reprovision: 1
     targetDisk: /dev/disk/by-id/ata-512GB_SSD_MP23B72602251
   operatingSystem:
     distribution: arch
