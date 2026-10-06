@@ -1,6 +1,6 @@
 apiVersion: homelab.io/v1alpha1
 kind: InventoryCaptureGroup
-metadata: {name: ssh-trust}
+metadata: {name: ssh-managed}
 spec:
   selector:
     matchKinds: [{apiVersion: homelab.io/v1alpha1, kind: Server}]

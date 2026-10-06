@@ -4,6 +4,7 @@ kind: Server
 metadata:
   name: beelink
   labels:
+    homelab.io/ssh-management: enabled
     homelab.io/role: workstation
 spec:
   operatingSystem:

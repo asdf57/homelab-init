@@ -88,6 +88,8 @@ Review these resources:
 - `CommandsPipeline/`: reusable capture group, repository, provider, and optional scheduled command template.
 - `Command/`: immutable one-shot execution requests targeting an executor;
   scripts are published to UID-owned Git directories.
+- `Pipeline/`: explicit persistent operator pipelines. The SSH operator uses
+  the existing provider and targets the ssh-managed capture group.
 - `ISO/`: image configuration, CA reference, provider, and input repository.
   Its child Pipeline is generated automatically, not uploaded manually.
 - `SSHCertificate/`: administrator-managed certificates with automatic renewal;
@@ -174,7 +176,10 @@ Stigmergy uses `CommandsPipeline/commands-pipeline-servers.yaml` as reusable exe
 
 A Command spec cannot be edited. Use a new resource name for another run; reapplying an existing request is a no-op, but recreating it after deletion runs again. The bootstrap servers example intentionally has no TTL, so repeated bootstrap does not rerun it. Do not put TTL-expiring requests in continuously reapplied desired configuration.
 
-The `ssh-trust` executor's `schedule: 5m` and `commandTemplate` create fresh Commands with one-day retention. There is no fixed ssh-trust Command manifest. Scheduled runs skip overlap/missed intervals. Ad-hoc runs may overlap.
+The host-key/user-trust operator is Pipeline/reconcile-ssh-host-keys-ssh-managed,
+with a serial operator job and a Concourse time resource (5m). It can also be
+triggered manually. Each build reads current InventoryCaptureGroup/ssh-managed
+and Server state; it does not create disposable Commands for recurring work.
 
 
 The command applies this repository, reads platform variables directly from
@@ -202,6 +207,14 @@ applying the manifests. Live images embed the restricted agent token from privat
 Concourse credentials. ISO and PXE downloads remain public by operator choice:
 any downloader can extract and use this agent token. Token rotation requires
 rebuilding the images;
-the provisioning runner requires a private key, current certificate and verified
-known-hosts file. Trust rollout is opt-in via `homelab.io/ssh-management: enabled`
-on installed Servers.
+the provisioning runner requires a private key and current certificate and
+derives strict known_hosts from verified Server public identities in the API.
+Opt in before first boot with `homelab.io/ssh-management: enabled`.
+The Server controller automatically owns one SSHKeyPair per Server UID. The
+operator persists a first-contact TOFU pin before fetching/installing the managed
+private host key, verifies a fresh managed-key connection, and reconciles user-CA
+trust. First-contact impersonation remains an explicit v1 risk. Subsequent host
+key changes fail closed and require deliberate administrator recovery/reset.
+Bootstrap supplies the restricted host-key OpenBao AppRole. Existing API policies
+must allow the runner GET SSHKeyPair, without rotating its token or granting
+Secret reads. See the rollout document for the status-reset and deployment steps.

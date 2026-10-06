@@ -1,0 +1,57 @@
+apiVersion: homelab.io/v1alpha1
+kind: Pipeline
+metadata: {name: reconcile-ssh-host-keys-ssh-managed}
+spec:
+  providerRef: {name: concourse}
+  externalName: reconcile-ssh-host-keys-ssh-managed
+  definition:
+    format: concourse
+    data: |
+      resources:
+        - name: interval
+          type: time
+          source: {interval: 5m}
+        - name: operator-code
+          type: git
+          source:
+            uri: https://github.com/asdf57/ansible-roles.git
+            branch: main
+        - name: runner
+          type: registry-image
+          source: {repository: registry.ryuugu.dev/arch-provisioner, tag: latest}
+      jobs:
+        - name: operator
+          serial: true
+          plan:
+            - get: interval
+              trigger: true
+            - get: operator-code
+            - get: runner
+            - task: reconcile
+              image: runner
+              timeout: 15m
+              config:
+                platform: linux
+                inputs: [{name: operator-code}]
+                params:
+                  CONTAINER_MODE: operator
+                  INVENTORY_CAPTURE_GROUP: ssh-managed
+                  STIGMERGY_API_URL: https://stigmergy.ryuugu.dev
+                  STIGMERGY_API_TOKEN: ((stigmergy-runner-token))
+                  ANSIBLE_PRIVATE_KEY: ((ssh/clients/ansible-runner.privateKey))
+                  ANSIBLE_CERTIFICATE: ((ansible-runner-certificate))
+                  BAO_ADDR: https://vault-api.ryuugu.dev
+                  HOST_KEY_SECRET_STORE: openbao
+                  HOST_KEY_BAO_ROLE_ID: ((ssh-host-operator-auth.roleId))
+                  HOST_KEY_BAO_SECRET_ID: ((ssh-host-operator-auth.secretId))
+                run:
+                  path: /bin/bash
+                  user: keiichi
+                  args:
+                    - -ec
+                    - |
+                      ln -s "$PWD/operator-code" /homelab/ansible-roles
+                      ln -s /homelab/ansible-roles/roles /homelab/roles
+                      ln -s /homelab/ansible-roles/plays /homelab/plays
+                      source /etc/profile.d/init.sh
+                      exec python3 /homelab/ansible-roles/operators/ssh_host_keys.py
