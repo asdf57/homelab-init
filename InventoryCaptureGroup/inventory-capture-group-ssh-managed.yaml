@@ -9,3 +9,9 @@ spec:
     all:
       ansible_user: ansible
       ansible_become: true
+      provision_disable_eee: true
+      storage:
+        partitions:
+          - {fs_type: efi, alloc_type: size, size: 512, flags: [boot, esp]}
+          - {fs_type: swap, alloc_type: size, size: 2048, flags: []}
+          - {fs_type: ext4, alloc_type: percentage, size: 100, flags: []}

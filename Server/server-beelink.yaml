@@ -7,6 +7,10 @@ metadata:
     homelab.io/ssh-management: enabled
     homelab.io/role: workstation
 spec:
+  provisioning:
+    enabled: false
+    reprovision: 0
+    targetDisk: /dev/disk/by-id/ata-512GB_SSD_MP23B72602251
   operatingSystem:
     distribution: arch
     version: rolling

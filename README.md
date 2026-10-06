@@ -76,10 +76,11 @@ Review these resources:
   key write access; the controller creates its input branch, not the GitHub repo.
 - `Router/`: RouterOS management address; its credential reference must be
   `<PRIMARY_ROUTER_NAME>-credentials`.
-- `Server/`: LLDP selectors, `operatingSystem`, management networks, users,
-  and labels. PXE selects the Server bound at that switch/port and boots its
-  declared OS; supported values are Arch/rolling/amd64/UEFI and
-  Debian/Trixie/amd64/UEFI.
+- `Server/`: LLDP selectors, desired installed `operatingSystem`, live-image
+  `boot.isoRef`, management networks, users, and labels. Normal boot uses disk
+  GRUB; authorized reprovisioning selects its one-shot iPXE entry. Keep
+  provisioning disabled until the disk and boot/install tests are approved.
+  See Stigmergy's `docs/server-provisioning-rollout.md` for standup and requests.
 - `InventoryCaptureGroup/inventory-capture-group-platform.yaml`: platform
   addresses, domains, repositories, networking, and Concourse configuration.
 - `InventoryCaptureGroup/inventory-capture-group-servers.yaml`: managed server
