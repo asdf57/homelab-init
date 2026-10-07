@@ -79,7 +79,9 @@ Review these resources:
 - `Server/`: LLDP selectors, desired installed `operatingSystem`, live-image
   `boot.isoRef`, management networks, users, and labels. Normal boot uses disk
   GRUB; authorized reprovisioning selects its one-shot iPXE entry. Keep
-  provisioning disabled until the disk and boot/install tests are approved.
+  provisioning enabled only on intended managed nodes. Enabling it allows live
+  discovery/explicit runs, not installation. Select the disk in a ProvisioningRun
+  through the API/UI; never check destructive runs into initialization.
   See Stigmergy's `docs/server-provisioning-rollout.md` for standup and requests.
 - `InventoryCaptureGroup/inventory-capture-group-platform.yaml`: platform
   addresses, domains, repositories, networking, and Concourse configuration.

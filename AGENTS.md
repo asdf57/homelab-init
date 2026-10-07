@@ -1,7 +1,7 @@
 # Site resources and initialization
 
-- Resources here are executable desired state, not harmless examples. Review
-  enabled provisioning flags and counters before applying or running init.
+- Resources here are executable desired state. Never check destructive
+  ProvisioningRun requests into init; create each explicitly through the API/UI.
 - Each Server owns its managed SSHKeyPair through controller reconciliation;
   do not manually duplicate key resources per Server or rotate Git SSH keys.
 - The management account is always `ansible`; do not add custom management-user
@@ -12,10 +12,10 @@
   group and share `server-lifecycle`. Do not add per-attempt pipelines/branches.
 - Storage and common provisioning inputs belong in appropriate capture-group
   Ansible group variables. Operators must use Ansible inventory resolution.
-- For a reviewed Server replacement, increment its reprovision counter exactly
-  once with conditional API writes and promptly update the checked-in Server
-  resource to the same counter. Do not let later init roll counters backward or
-  replay an old replacement request. Job triggers do not increment counters.
+- Enabling Server provisioning permits explicit runs/live discovery, not erasure.
+  A reviewed replacement creates one immutable ProvisioningRun with the Server
+  generation, Server/Machine UIDs and one discovered disk ID. Job triggers poll
+  runs and never authorize replacement. Server spec has no disk or counter.
 - Beelink was successfully provisioned on request 5; its approved SSD is
   `/dev/disk/by-id/ata-512GB_SSD_MP23B72602251` (serial MP23B72602251). Its USB
   was excluded. This completed request is NOT permission for another replacement.
