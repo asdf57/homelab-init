@@ -1,9 +1,9 @@
 apiVersion: homelab.io/v1alpha1
 kind: Pipeline
-metadata: {name: reconcile-ssh-host-keys-ssh-managed}
+metadata: {name: provision-ssh-managed}
 spec:
   providerRef: {name: concourse}
-  externalName: reconcile-ssh-host-keys-ssh-managed
+  externalName: provision-ssh-managed
   definition:
     format: concourse
     data: |
@@ -20,16 +20,16 @@ spec:
           type: registry-image
           source: {repository: registry.ryuugu.dev/arch-provisioner, tag: latest}
       jobs:
-        - name: operator
+        - name: provision
           serial: true
           plan:
             - get: interval
               trigger: true
             - get: operator-code
             - get: runner
-            - task: reconcile
+            - task: reconcile-provisioning
               image: runner
-              timeout: 15m
+              timeout: 3h
               config:
                 platform: linux
                 inputs: [{name: operator-code}]
@@ -54,4 +54,4 @@ spec:
                       ln -s /homelab/ansible-roles/roles /homelab/roles
                       ln -s /homelab/ansible-roles/plays /homelab/plays
                       source /etc/profile.d/init.sh
-                      exec python3 /homelab/ansible-roles/operators/ssh_host_keys.py
+                      exec python3 /homelab/ansible-roles/operators/provisioning.py

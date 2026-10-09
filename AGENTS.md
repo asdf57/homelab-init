@@ -7,9 +7,10 @@
 - The management account is always `ansible`; do not add custom management-user
   selection fields. Runtime reconciliation is handled by its installed service
   and timer, not by granting homelabd general root/user-management powers.
-- Shared SSH/provisioning operator jobs are defined in
-  `Pipeline/pipeline-reconcile-ssh-host-keys.yaml`, use the `ssh-managed` capture
-  group and share `server-lifecycle`. Do not add per-attempt pipelines/branches.
+- SSH/provisioning pipelines are defined in `Pipeline/pipeline-reconcile-ssh-host-keys.yaml`
+  and `Pipeline/pipeline-provision.yaml`, using the `ssh-managed` capture group.
+  API-backed Server reservations coordinate mutations across pipelines;
+  serial groups do not cross pipelines. Do not add per-attempt pipelines/branches.
 - Storage and common provisioning inputs belong in appropriate capture-group
   Ansible group variables. Operators must use Ansible inventory resolution.
 - Enabling Server provisioning permits explicit runs/live discovery, not erasure.
