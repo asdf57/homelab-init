@@ -202,7 +202,11 @@ PiKVM is configured this way at `pikvm.ryuugu.dev`, upstream `https://10.1.1.51`
 Management uses `SSHKeyPair/ansible-runner` plus its managed `SSHCertificate`.
 homelabd has no management authorized-key installation interface.
 
-Apply with an authorized `STIGMERGY_API_TOKEN`. Local `groupVarsRef` files are
+Apply with an authorized `STIGMERGY_API_TOKEN`. The uploader requires `curl`,
+`jq`, and either Mike Farah's `yq` or the Python `yq` jq wrapper. Run
+`./upload.sh` for all site manifests, or `./upload.sh Server/server-lima.yaml`
+to apply only Zima. `ProvisioningRun` inputs are rejected.
+Local `groupVarsRef` files are
 rendered into generic `groupVars` by the uploader, not sent as API fields.
 
 See `stigmergy/docs/ssh-management-rollout.md` in the homelab workspace before

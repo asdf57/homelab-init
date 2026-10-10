@@ -1,0 +1,30 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: Server
+metadata:
+  name: zima
+  labels:
+    homelab.io/ssh-management: enabled
+    homelab.io/role: workstation
+spec:
+  provisioning:
+    enabled: true
+  operatingSystem:
+    distribution: arch
+    version: rolling
+    architecture: amd64
+    bootMode: uefi
+  sshCertificateAuthorityRef: {name: homelab-user-ca}
+  boot:
+    isoRef: {name: arch-rolling-amd64}
+  machineSelector:
+    location:
+      lldp_port: bridge/ether6
+      switch_mac: d4:01:c3:27:91:67
+  networking:
+    management:
+      interfaceSelector:
+        attachedAtMachineLocation: true
+      addressSelector:
+        family: ipv4
+        subnet: 10.1.1.0/24
