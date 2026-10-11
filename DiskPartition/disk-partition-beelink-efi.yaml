@@ -1,0 +1,11 @@
+apiVersion: homelab.io/v1alpha1
+kind: DiskPartition
+metadata: {name: beelink-efi}
+spec:
+  serverRef: {name: beelink}
+  diskSelector: {serial: MP23B72602251}
+  number: 1
+  capacity: {storage: 512Mi}
+  role: efi
+  filesystem: vfat
+  mountPoint: /boot/efi

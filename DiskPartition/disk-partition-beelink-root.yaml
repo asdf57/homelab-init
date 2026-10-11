@@ -1,0 +1,11 @@
+apiVersion: homelab.io/v1alpha1
+kind: DiskPartition
+metadata: {name: beelink-root}
+spec:
+  serverRef: {name: beelink}
+  diskSelector: {serial: MP23B72602251}
+  number: 3
+  capacity: {useRemaining: true}
+  role: root
+  filesystem: ext4
+  mountPoint: /

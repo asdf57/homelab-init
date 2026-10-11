@@ -11,8 +11,8 @@
   and `Pipeline/pipeline-provision.yaml`, using the `ssh-managed` capture group.
   API-backed Server reservations coordinate mutations across pipelines;
   serial groups do not cross pipelines. Do not add per-attempt pipelines/branches.
-- Storage and common provisioning inputs belong in appropriate capture-group
-  Ansible group variables. Operators must use Ansible inventory resolution.
+- Per-server storage belongs in DiskPartition resources. Capture groups carry
+  only common execution settings; operators consume the run's pinned storage plan.
 - Enabling Server provisioning permits explicit runs/live discovery, not erasure.
   A reviewed replacement creates one immutable ProvisioningRun with the Server
   generation, Server/Machine UIDs and one discovered disk ID. Job triggers poll

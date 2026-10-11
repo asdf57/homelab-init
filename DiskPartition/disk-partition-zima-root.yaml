@@ -1,0 +1,11 @@
+apiVersion: homelab.io/v1alpha1
+kind: DiskPartition
+metadata: {name: zima-root}
+spec:
+  serverRef: {name: zima}
+  diskSelector: {serial: "0x7722479b"}
+  number: 3
+  capacity: {useRemaining: true}
+  role: root
+  filesystem: ext4
+  mountPoint: /

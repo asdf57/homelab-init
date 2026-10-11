@@ -1,0 +1,10 @@
+apiVersion: homelab.io/v1alpha1
+kind: DiskPartition
+metadata: {name: beelink-swap}
+spec:
+  serverRef: {name: beelink}
+  diskSelector: {serial: MP23B72602251}
+  number: 2
+  capacity: {storage: 2Gi}
+  role: swap
+  filesystem: swap
