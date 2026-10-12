@@ -1,0 +1,5 @@
+apiVersion: homelab.io/v1alpha1
+kind: GitRepository
+metadata: {name: ansible-roles}
+spec:
+  url: https://github.com/asdf57/ansible-roles.git
