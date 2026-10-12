@@ -47,5 +47,7 @@ spec:
                     - -ec
                     - |
                       ln -s "$PWD/operator-code" /homelab/ansible-roles
+                      ln -s /homelab/ansible-roles/roles /homelab/roles
+                      ln -s /homelab/ansible-roles/plays /homelab/plays
                       source /etc/profile.d/init.sh
                       exec python3 /homelab/ansible-roles/operators/configurations.py
