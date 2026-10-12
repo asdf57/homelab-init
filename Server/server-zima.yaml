@@ -6,6 +6,8 @@ metadata:
   labels:
     homelab.io/ssh-management: enabled
     homelab.io/role: workstation
+    homelab.io/kube-cluster: lab
+    homelab.io/kube-role: control-plane
 spec:
   provisioning:
     enabled: true
