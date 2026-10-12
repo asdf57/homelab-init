@@ -1,0 +1,17 @@
+# The target supplies settings; dependsOn supplies explicit readiness dependencies.
+# The capture group supplies inventory; the playbook selects hosts and role order.
+apiVersion: homelab.io/v1alpha1
+kind: Configuration
+metadata:
+  name: kube-setup-lab
+spec:
+  targetRef:
+    kind: KubeCluster
+    name: lab
+  inventoryCaptureGroupRef:
+    name: ssh-managed
+  playbook:
+    repositoryRef:
+      name: ansible-roles
+    path: plays/configure_kube.yml
+  dependsOn: []
