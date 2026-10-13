@@ -1,0 +1,14 @@
+---
+apiVersion: homelab.io/v1alpha1
+kind: DNSRecord
+metadata:
+  name: kube-api-lab
+spec:
+  backingStoreRef:
+    kind: Router
+    name: mikrotik-1
+  name: kube-api.lab.ryuugu.dev.
+  zone: ryuugu.dev
+  type: A
+  value: 10.1.1.28
+  ttl: 300
