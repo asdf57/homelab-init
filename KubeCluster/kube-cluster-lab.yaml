@@ -5,6 +5,8 @@ metadata:
 spec:
   kubernetesVersion: "1.37.1"
   containerdVersion: "2.4.1"
+  runcVersion: "1.5.2"
+  cniPluginsVersion: "1.9.1"
   controlPlaneEndpoint: kube-api.lab.ryuugu.dev:6443
   podCIDR: 172.28.0.0/16
   serviceCIDR: 172.29.0.0/16
