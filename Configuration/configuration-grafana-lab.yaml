@@ -22,3 +22,5 @@ spec:
       name: lab
   dependsOn:
     - name: kube-setup-lab
+    - name: lab-prometheus
+    - name: lab-node-exporter
