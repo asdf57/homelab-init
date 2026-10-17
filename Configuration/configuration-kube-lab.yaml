@@ -1,5 +1,6 @@
 # The target supplies settings; dependsOn supplies explicit readiness dependencies.
-# The capture group supplies inventory; the playbook selects hosts and role order.
+# The capture group supplies inventory; the command selects hosts and role order.
+# The explicit extra-vars file supplies the operator's namespaced public context.
 apiVersion: homelab.io/v1alpha1
 kind: Configuration
 metadata:
@@ -10,8 +11,13 @@ spec:
     name: lab
   inventoryCaptureGroupRef:
     name: ssh-managed
-  playbook:
+  source:
     repositoryRef:
       name: ansible-roles
-    path: plays/configure_kube.yml
+  command:
+    argv:
+      - ansible-playbook
+      - plays/configure_kube.yml
+      - -e
+      - "@../values.json"
   dependsOn: []
