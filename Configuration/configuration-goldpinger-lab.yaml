@@ -1,0 +1,24 @@
+apiVersion: homelab.io/v1alpha1
+kind: Configuration
+metadata:
+  name: lab-goldpinger
+spec:
+  targetRef:
+    kind: KubeCluster
+    name: lab
+  inventoryCaptureGroupRef:
+    name: ssh-managed
+  source:
+    repositoryRef:
+      name: ansible-roles
+  command:
+    argv:
+      - ansible-playbook
+      - plays/goldpinger.yml
+      - -e
+      - mode=install
+  context:
+    kubeClusterRef:
+      name: lab
+  dependsOn:
+    - name: kube-setup-lab
